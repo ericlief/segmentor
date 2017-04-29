@@ -33,7 +33,7 @@ tokenizer.py:
 	chmod u+x tokenizer.py
 
 reconstruct-sentences.py:
-	chmod u+x tokenizer.py
+	chmod u+x reconstruct-sentences.py
 
 Europarl.raw.%.gz:
 	wget -O "$@" 'http://opus.lingfil.uu.se/download.php?f=Europarl/mono/Europarl.raw.$*.gz'
@@ -41,11 +41,10 @@ Europarl.raw.%.gz:
 training-data-ep-%.gz: $(DATA_SOURCE)
 	gunzip -ckv $(TRAIN_CORPUS-$*) | ./tokenizer.py "$<" > "$@"
 
-
-Europarl.raw.%: Europarl.raw.%.gz
+#Europarl.raw.%: Europarl.raw.%.gz
 #	gunzip -kv "$<"
 
-Europarl.raw.%: Europarl.raw.%.gz
+#Europarl.raw.%: Europarl.raw.%.gz
 #	gunzip -ckv $(TRAIN_CORPUS-$*) | ./tokenizer.py
 
 clean:
