@@ -6,13 +6,15 @@
 
 MORFESSOR_MODEL::=morfessor-model
 
-#DATA_SOURCE::=Europarl.raw.en
 DATA_SOURCE::=Europarl.raw.en.gz
 
-#TRAIN_CORPUS-%::=Europarl.raw.en.gz
 TRAIN_CORPUS-%::=training-data-ep.%.gz
 
 all: tokenizer.py reconstruct-sentences.py output-segmented-ep.en
+
+output-segmented-ep.%: segments-ep.% $(DATA_SOURCE)
+	#output-segmented-ep-%.txt: segments-ep-%.txt training-data-ep-%.gz
+	gunzip -ckv $(TRAIN_CORPUS-$*) | ./reconstruct-sentences.py "$<" > "$@"
 
 # Run Morfessor on the input, save a mapping from words to segments.
 segments.%: $(MORFESSOR_MODEL)-%.bin $(DATA_SOURCE)
@@ -27,11 +29,6 @@ morfessor-model-%.bin: $(DATA_SOURCE)
 	#morfessor -t $(TRAIN_CORPUS-$*) -s "$@" -x "lexicon-$*.txt" --logfile "morfessor-train-$*-log.txt"
 	ulimit -t unlimited && nice -n 19 morfessor -t $(TRAIN_CORPUS-$*) -s "$@" -x "lexicon.$*" --logfile "morfessor-train-log.$*"
 
-output-segmented-ep.%: segments-ep.% $(DATA_SOURCE)
-#output-segmented-ep-%.txt: segments-ep-%.txt training-data-ep-%.gz
-
-	gunzip -ckv $(TRAIN_CORPUS-$*) | ./reconstruct-sentences.py "$<" > "$@"
-
 tokenizer.py:
 	chmod u+x tokenizer.py
 
@@ -45,10 +42,10 @@ training-data-ep-%.gz: $(DATA_SOURCE)
 	gunzip -ckv $(TRAIN_CORPUS-$*) | ./tokenizer.py "$<" > "$@"
 
 
-#Europarl.raw.%: Europarl.raw.%.gz
+Europarl.raw.%: Europarl.raw.%.gz
 #	gunzip -kv "$<"
 
-#Europarl.raw.%: Europarl.raw.%.gz
+Europarl.raw.%: Europarl.raw.%.gz
 #	gunzip -ckv $(TRAIN_CORPUS-$*) | ./tokenizer.py
 
 clean:
