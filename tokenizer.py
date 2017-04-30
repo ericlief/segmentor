@@ -1,10 +1,14 @@
+
 from nltk.tokenize.moses import MosesTokenizer, MosesDetokenizer
-import io
+from nltk.tokenize.treebank import TreebankWordTokenizer
+#from nltk.tokenize.stanford import StanfordTokenizer
+
+#import io
 import sys
 
-#stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-
-t, d = MosesTokenizer(), MosesDetokenizer()
+t = TreebankWordTokenizer()
+#t = MosesTokenizer()
+#t = StanfordTokenizer()
 #tokenized_output_file = sys.argv[1]
 
 # with open(sys.argv[1], 'w') as f:
@@ -13,13 +17,15 @@ t, d = MosesTokenizer(), MosesDetokenizer()
 #         tokens = t.tokenize(line, return_str=True)
 #         f.write(tokens)
 
-cnt = 0
+#cnt = 0
 for sentence in sys.stdin:
-    if cnt >= 1000:
-        break
-    tokens = t.tokenize(sentence, return_str=True)
-    sys.stdout(tokens)
-    cnt += 1
+   # if cnt >= 1000:
+   #    break
+    #tokens = t.tokenize(sentence, return_str=True)
+    tokens = t.tokenize(sentence)
+    sys.stdout.write(' '.join(tokens) + '\n')
+    #sys.stdout.write(tokens + '\n') 
+    #cnt += 1
 
 
 
