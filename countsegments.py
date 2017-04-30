@@ -9,10 +9,12 @@ Created on 30.04.17
 
 import sys
 
-# STDIN contains the segmented sentences separated by a delimiter
+# STDIN contains the output segmented sentences separated by a delimiter
+# resulting from the training task.
+
 # Read each sentence and count the number of splits per word
 
-split_counts = [0,0,0,0,0,0,0,0,0,0]
+split_counts = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 for segmented_sentence in sys.stdin:
     segmented_words = segmented_sentence.rstrip().split(" ◽ ")
     # print(segmented_words)
