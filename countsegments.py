@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -17,7 +18,7 @@ import glob
 #head, tail = os.path.split("~/segmentor/output-segmented*")
 
 
-def counts(file):
+def calc_splits(file):
     """
     Read each sentence and calculate the number of splits per word
     and total distribution of splits.
@@ -25,7 +26,7 @@ def counts(file):
     :return frequency of splits:
     """
     #print(file)
-    split_counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    split_counts = [0, 0, 0, 0]
     for segmented_sentence in file:
         #print(segmented_sentence)
         segmented_words = segmented_sentence.rstrip().split(" ◽ ")          # the ◽ cat s ◽ chas ed ◽ the ◽ mouse
@@ -33,10 +34,14 @@ def counts(file):
         #print(segmented_words)
         #print(splits_per_word)
         for i in splits_per_word:
-            if i < 10:
+            if i <= 2:
                 split_counts[i] += 1
+            elif i > 2:
+                split_counts[3] += 1
+                
     #print(split_counts)
     total_splits = sum(split_counts)
+    
     #print("total splits = ", total_splits)
     freqs = [i / total_splits for i in split_counts]
     return freqs
@@ -45,10 +50,16 @@ def counts(file):
 filenames = glob.glob('*output-segmented-*.*')
 #print(filenames)
 with open('output-stats.txt', 'w') as out:
+    out.write("corpus\t0\t1\t2\t3+\n")
     for filename in filenames:
-        with open(filename, 'rt') as f:
-            out.write("Filename: " + filename + '\n')
+        with open(filename, 'rt') as output_segmented_file:
+            #out.write(str(output_segmented_file))
+            #out.write(str(calc_splits(output_segmented_file)))
+            # out.write("corpus\t0\t1\t2\t3+\n")
+            out.write(filename[-5:] + '\t')
             #for sentence in f:
-            out.write(str(counts(f)) + '\n')
+            for freq in calc_splits(output_segmented_file):
+                out.write(str(round(freq, 2)) + '\t')
+            out.write('\n')
 
 

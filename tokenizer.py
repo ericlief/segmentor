@@ -17,16 +17,18 @@ t = TreebankWordTokenizer()
 #         tokens = t.tokenize(line, return_str=True)
 #         f.write(tokens)
 
-#cnt = 0
+cnt = 0
 for sentence in sys.stdin:
-   # if cnt >= 1000:
-   #    break
+   if cnt >= 100000000:
+       break
+   
     #tokens = t.tokenize(sentence, return_str=True)
-    tokens = t.tokenize(sentence)
-    sys.stdout.write(' '.join(tokens) + '\n')
+   tokens = t.tokenize(sentence)
+   sys.stdout.write(' '.join(tokens) + '\n')
     #sys.stdout.write(tokens + '\n') 
-    #cnt += 1
-
+   cnt += 1
+   
+ 
 
 
 
