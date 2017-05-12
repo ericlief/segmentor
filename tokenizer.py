@@ -1,12 +1,14 @@
-
+from nltk.tokenize.punkt import PunktSentenceTokenizer
 from nltk.tokenize.moses import MosesTokenizer, MosesDetokenizer
 from nltk.tokenize.treebank import TreebankWordTokenizer
 #from nltk.tokenize.stanford import StanfordTokenizer
+from nltk.tokenize import wordpunct_tokenize
 
 #import io
 import sys
 
 t = TreebankWordTokenizer()
+#t = PunktSentenceTokenizer()
 #t = MosesTokenizer()
 #t = StanfordTokenizer()
 #tokenized_output_file = sys.argv[1]
@@ -17,16 +19,17 @@ t = TreebankWordTokenizer()
 #         tokens = t.tokenize(line, return_str=True)
 #         f.write(tokens)
 
-cnt = 0
+#cnt = 0
 for sentence in sys.stdin:
-   if cnt >= 100000000:
-       break
+  # if cnt >= 100000000:
+  #     break
    
     #tokens = t.tokenize(sentence, return_str=True)
-   tokens = t.tokenize(sentence)
-   sys.stdout.write(' '.join(tokens) + '\n')
+   #tokens = t.tokenize(sentence)
+    tokens = wordpunct_tokenize(sentence)
+    sys.stdout.write(' '.join(tokens) + '\n')
     #sys.stdout.write(tokens + '\n') 
-   cnt += 1
+   #cnt += 1
    
  
 

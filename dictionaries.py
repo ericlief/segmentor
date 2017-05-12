@@ -7,19 +7,10 @@ Created on 07.05.17
 @author: Eric Lief
 """
 
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-Project: segmentor
-Created on 30.04.17
-@author: Eric Lief
-"""
 
 import sys
 import os
 import glob
-
 
 def process_tokens(segments_file):
 
