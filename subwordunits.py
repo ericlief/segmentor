@@ -598,12 +598,13 @@ class SubWordUnits:
         with open('stats' + dict_file_suffix, 'w') as f_out:
             for signature, words in self.signatures.items():
                 N = len(self.all_words)
-                n = len(words)
-                freq = n / N
-                f_out.write(signature + '\n')
-                f_out.write('raw count: ' + str(n) + '\n')
-                f_out.write('out of total: ' + str(N) + '\n')
-                f_out.write('frequency: ' + str(freq) + '\n\n')
+                raw_cnt = len(words)
+                freq = round(raw_cnt / N, 2)
+                #f_out.write('\n')
+                f_out.write(str(raw_cnt) + '\t' + str(freq) + '\t' + signature + '\n')
+                #f_out.write('raw count: ' + str(n) + '\n')
+                #f_out.write('out of total: ' + str(N) + '\n')
+                #f_out.write('frequency: ' + str(freq) + '\n\n')
 
 
 # MAIN
