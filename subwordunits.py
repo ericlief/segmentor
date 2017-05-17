@@ -569,29 +569,30 @@ class SubWordUnits:
         dict_file_suffix = self.segments_file_in[8:]
 
         # Write no split words
-        with open('no-split' + dict_file_suffix, 'w') as f_out:
-            for w in self.no_split_words:
-                f_out.write(str(w) + '\n')
+        # with open('no-split' + dict_file_suffix, 'w') as f_out:
+        #     for w in self.no_split_words:
+        #         f_out.write(str(w) + '\n')
 
         # Write stems
         with open('stems' + dict_file_suffix, 'w') as f_out:
-            for w in self.stems:
-                f_out.write(str(w) + '\n')
+            for m, cnt in self.stems.items():
+                f_out.write(str(cnt) + '\t' + m + '\n')
 
         # Write prefixes
         with open('prefixes' + dict_file_suffix, 'w') as f_out:
-            for w in self.prefixes:
-                f_out.write(str(w) + '\n')
+            for m, cnt in self.prefixes.items():
+                f_out.write(str(cnt) + '\t' + m + '\n')
 
         # Write suffixes
         with open('suffixes' + dict_file_suffix, 'w') as f_out:
-            for w in self.suffixes:
-                f_out.write(str(w) + '\n')
+            for m, cnt in self.suffixes.items():
+                f_out.write(str(cnt) + '\t' + m + '\n')
 
         # Writes signature (mapping)
         with open('signatures' + dict_file_suffix, 'w') as f_out:
-            for w in self.signatures.items():
-                f_out.write(str(w[0]) + '(' + str(w[1]) + ')' + '\n')
+            for signature, words in self.signatures.items():
+                f_out.write('\n')
+                f_out.write(str(signature) + '(' + str(words) + ')' + '\n')
 
         # Writes stats
         with open('stats' + dict_file_suffix, 'w') as f_out:
