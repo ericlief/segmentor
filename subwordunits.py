@@ -101,14 +101,14 @@ class SubWordUnits:
                 #         self.other_one_split_words.append(word)      # add one-split word to process later
 
                 if match2p:
-                    print("2+ split?")
+                    #print("2+ split?")
                     # groups = match2p.groups()
                     # size = len(groups)
                     # s = ''
                     # print(size)
                     # print(match2p[0])
                     morphs = match2p[0].split()
-                    print(morphs)
+                    #print(morphs)
                     # lengths = [(m, len(m)) for m in morphs]
                     max_len_morph = max(morphs, key=len)  # this is stem
                     max_len = len(max_len_morph)
@@ -121,7 +121,7 @@ class SubWordUnits:
                         if m != max_len_morph and max(len(m) / max_len, max_len / len(m)) < 2:
                             is_stem_2X = False
 
-                    print("stem 2X=", is_stem_2X)
+                    #print("stem 2X=", is_stem_2X)
 
                     # TODO
                     # Add word to signatures here also
@@ -134,18 +134,18 @@ class SubWordUnits:
                                 # self.prefixes.append(m)
                                 self.prefixes[m] += 1
                                 signature += '-p' if signature else 'p'
-                                print('prefix ', m)
+                                #print('prefix ', m)
                             elif i > max_i:
                                 # self.suffixes.append(m)
                                 self.suffixes[m] += 1
                                 signature += '-e' if signature else 'e'
 
-                                print('suffix ', m)
+                                #print('suffix ', m)
                             else:
                                 # self.stems.append(m)
                                 self.stems[m] += 1
                                 signature += '-s' if signature else 's'
-                                print('stem ', m)
+                                #print('stem ', m)
 
                         # Add word to list of processed words
                         hyphen_word = '-'.join(morphs)
@@ -186,7 +186,7 @@ class SubWordUnits:
         # and add morphs and sigs
         #
 
-        print('processing one split')
+        #print('processing one split')
 
         # one split non-numeric morphs only
         p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
@@ -208,12 +208,12 @@ class SubWordUnits:
                 match1 = re.search(p1, word)
 
                 if match1:
-                    print("found new one split")
+                    #print("found new one split")
                     m1 = match1.group(1)
-                    print("m1: ", repr(m1))
+                    #print("m1: ", repr(m1))
 
                     m2 = match1.group(2)
-                    print("m2: ", repr(m2))
+                    #print("m2: ", repr(m2))
 
                     morphs = [m1, m2]
                     hyphen_word = '-'.join(morphs)
@@ -222,14 +222,14 @@ class SubWordUnits:
                         self.processed_words.add(word)
                         self.prefixes[m1] += 1
                         self.stems[m2] += 1
-                        print("found new p-s")
+                        #print("found new p-s")
 
                     elif m1 in self.stems and m2 in self.suffixes:
                         self.signatures['s-e'].append(hyphen_word)
                         self.processed_words.add(word)
                         self.stems[m1] += 1
                         self.suffixes[m2] += 1
-                        print("found new s-e")
+                        #print("found new s-e")
 
     def reprocess_known_one_split(self):
         # TODO:=
@@ -239,7 +239,7 @@ class SubWordUnits:
         # and add morphs and sigs
         #
 
-        print('reprocessing one split')
+        #print('reprocessing one split')
 
         # one split non-numeric morphs only
         p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
@@ -261,12 +261,12 @@ class SubWordUnits:
                 match1 = re.search(p1, word)
 
                 if match1:
-                    print("found new one split")
+                    #2Aprint("found new one split")
                     m1 = match1.group(1)
-                    print("m1: ", repr(m1))
+                    #print("m1: ", repr(m1))
 
                     m2 = match1.group(2)
-                    print("m2: ", repr(m2))
+                    #print("m2: ", repr(m2))
 
                     morphs = [m1, m2]
                     hyphen_word = '-'.join(morphs)
@@ -275,14 +275,14 @@ class SubWordUnits:
                         self.processed_words.add(word)
                         self.prefixes[m1] += 1
                         self.stems[m2] += 1
-                        print("found new p-s")
+                        #print("found new p-s")
 
                     elif m1 in self.stems or m2 in self.suffixes:
                         self.signatures['s-e'].append(hyphen_word)
                         self.processed_words.add(word)
                         self.stems[m1] += 1
                         self.suffixes[m2] += 1
-                        print("found new s-e")
+                        #print("found new s-e")
 
     def reprocess_2plus_words(self):
 
@@ -302,14 +302,14 @@ class SubWordUnits:
                 match2p = re.match(p2p, word)
 
                 if match2p:
-                    print("2+ split?")
+                    #print("2+ split?")
                     # groups = match2p.groups()
                     # size = len(groups)
                     # s = ''
                     # print(size)
                     # print(match2p[0])
                     morphs = match2p[0].split()
-                    print(morphs)
+                    #print(morphs)
 
                     signature = ''
                     for m in morphs:
@@ -317,18 +317,18 @@ class SubWordUnits:
                             # self.prefixes.append(m)
                             self.prefixes[m] += 1
                             signature += '-p' if signature else 'p'
-                            print('prefix ', m)
+                            #print('prefix ', m)
                         elif m in self.suffixes:
                             # self.suffixes.append(m)
                             self.suffixes[m] += 1
                             signature += '-e' if signature else 'e'
 
-                            print('suffix ', m)
+                            #print('suffix ', m)
                         elif m in self.stems:
                             # self.stems.append(m)
                             self.stems[m] += 1
                             signature += '-s' if signature else 's'
-                            print('stem ', m)
+                           # print('stem ', m)
 
                         else:       # morph not known, so mark with '?'
                             signature += '-?' if signature else '?'
@@ -348,7 +348,7 @@ class SubWordUnits:
         # and add morphs and sigsv
         #
 
-        print('adjusting boundary for one split')
+        #print('adjusting boundary for one split')
 
         # one split non-numeric morphs only
         p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
@@ -371,12 +371,12 @@ class SubWordUnits:
                 match1 = re.search(p1, word)
 
                 if match1:
-                    print("found new one split")
+                    #print("found new one split")
                     m1 = match1.group(1)
-                    print("m1: ", repr(m1))
+                    #print("m1: ", repr(m1))
 
                     m2 = match1.group(2)
-                    print("m2: ", repr(m2))
+                    #print("m2: ", repr(m2))
 
                     morphs = [m1, m2]
                     word = ''.join(morphs)
@@ -384,12 +384,12 @@ class SubWordUnits:
                     signature = ''
 
                     # Try shifting boundary to left
-                    print("shifting boundary left")
+                    #print("shifting boundary left")
                     new_m1 = word[:i_m2 - 1]  # indices of new first morph
                     new_m2 = word[i_m2 - 1:]  # indices of new second morph
                     # stem_index = -1
-                    print("new m1: ", new_m1)
-                    print("new m2: ", new_m2)
+                    #print("new m1: ", new_m1)
+                    #print("new m2: ", new_m2)
                     if new_m1 in self.stems and \
                        new_m2 in self.suffixes:
                         signature = 's-e'
@@ -399,12 +399,12 @@ class SubWordUnits:
 
                     # Try shifting boundary to right
                     else:
-                        print("shifting boundary right")
+                        #print("shifting boundary right")
 
                         new_m1 = word[:i_m2 + 1]  # indices of new first morph
                         new_m2 = word[i_m2 + 1:]  # indices of new second morph
-                        print("new m1: ", new_m1)
-                        print("new m2: ", new_m2)
+                        #print("new m1: ", new_m1)
+                        #print("new m2: ", new_m2)
                         if new_m1 in self.stems and \
                            new_m2 in self.suffixes:
                             signature = 's-e'
@@ -425,7 +425,7 @@ class SubWordUnits:
                         self._signatures['p-s'].append(hyphen_word)
                         self.processed_words.add(raw_word)
 
-                        print("found new p-s")
+                        #print("found new p-s")
 
                     elif signature == 's-e':
                         self.stems[new_m1] += 1
@@ -433,7 +433,7 @@ class SubWordUnits:
                         self.signatures['s-e'].append(hyphen_word)
                         self.processed_words.add(raw_word)
 
-                        print("found new s-e")
+                       # print("found new s-e")
 
                     # TODO: ???? words: should we add or reprocess????
                     # else:
@@ -441,14 +441,14 @@ class SubWordUnits:
                     #     self.processed_words.add(word)
 
 
-                    print("final word", hyphen_word, signature)
+                   # print("final word", hyphen_word, signature)
 
 
     def readjust_boundary_one_split(self):
         # TODO:= relax restriction that both morphs be in dictionary
         # after adjusting boundary
 
-        print('readjusting one split')
+        #print('readjusting one split')
 
         # one split non-numeric morphs only
         p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
@@ -471,12 +471,12 @@ class SubWordUnits:
                 match1 = re.search(p1, word)
 
                 if match1:
-                    print("found new one split")
+                    #print("found new one split")
                     m1 = match1.group(1)
-                    print("m1: ", repr(m1))
+                    #print("m1: ", repr(m1))
 
                     m2 = match1.group(2)
-                    print("m2: ", repr(m2))
+                    #print("m2: ", repr(m2))
 
                     morphs = [m1, m2]
                     word = ''.join(morphs)
@@ -484,13 +484,13 @@ class SubWordUnits:
                     signature = ''
 
                     # Try shifting boundary to left
-                    print("shifting boundary left")
+                    #print("shifting boundary left")
 
                     new_m1 = word[:i_m2 - 1]  # indices of new first morph
                     new_m2 = word[i_m2 - 1:]  # indices of new second morph
                     # stem_index = -1
-                    print("new m1: ", new_m1)
-                    print("new m2: ", new_m2)
+                    #print("new m1: ", new_m1)
+                    #print("new m2: ", new_m2)
                     if new_m1 in self.stems or \
                        new_m2 in self.suffixes:
                         signature = 's-e'
@@ -500,12 +500,12 @@ class SubWordUnits:
 
                     # Try shifting boundary to right
                     else:
-                        print("shifting boundary right")
+                        #print("shifting boundary right")
 
                         new_m1 = word[:i_m2 + 1]  # indices of new first morph
                         new_m2 = word[i_m2 + 1:]  # indices of new second morph
-                        print("new m1: ", new_m1)
-                        print("new m2: ", new_m2)
+                        #print("new m1: ", new_m1)
+                        #print("new m2: ", new_m2)
                         if new_m1 in self.stems or \
                            new_m2 in self.suffixes:
                             signature = 's-e'
@@ -526,7 +526,7 @@ class SubWordUnits:
                         self._signatures['p-s'].append(hyphen_word)
                         self.processed_words.add(raw_word)
 
-                        print("found new p-s")
+                        #print("found new p-s")
 
                     elif signature == 's-e':
                         self.stems[m1] += 1
@@ -534,7 +534,7 @@ class SubWordUnits:
                         self.signatures['s-e'].append(hyphen_word)
                         self.processed_words.add(raw_word)
 
-                        print("found new s-e")
+                       # print("found new s-e")
 
                     # TODO: ???? words: should we add or reprocess????
                     # else:
@@ -542,7 +542,7 @@ class SubWordUnits:
                     #     self.processed_words.add(word)
 
 
-                    print("final word", hyphen_word, signature)
+                   # print("final word", hyphen_word, signature)
 
 
     @property
@@ -611,46 +611,46 @@ filenames = glob.glob('segments-*')
 for filename in filenames:
     morphs = SubWordUnits(filename)
     morphs.process()
-    print(morphs.signatures)
-    print(morphs.processed_words)
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
     morphs.process_known_one_split()
-    print(morphs.signatures)
-    print(morphs.processed_words)
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
     morphs.adjust_boundary_one_split()
-    print(morphs.signatures)
-    print(morphs.processed_words)
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
     morphs.reprocess_known_one_split()
-    print(morphs.signatures)
-    print(morphs.processed_words)
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
     morphs.readjust_boundary_one_split()
-    print(morphs.signatures)
-    print(morphs.processed_words)
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
     morphs.reprocess_2plus_words()
-    print(morphs.signatures)
-    print(morphs.processed_words)
+    #print(morphs.signatures)
+    #print(morphs.processed_words)
 
     morphs.write_dicts()
-    print(morphs.prefixes)
-    print(morphs.stems)
-    print(morphs.suffixes)
+    #print(morphs.prefixes)
+    #print(morphs.stems)
+    #print(morphs.suffixes)
 
-    print('total word count/vocab')
-    print(morphs.all_words)
+    #print('total word count/vocab')
+    #print(morphs.all_words)
 
 # print(filenames)
 
