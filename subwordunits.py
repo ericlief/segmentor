@@ -609,7 +609,7 @@ class SubWordUnits:
 
 # MAIN
 # Get all segments files
-filenames = glob.glob('segments-*')
+filenames = glob.glob('minicorpus*')
 for filename in filenames:
     morphs = SubWordUnits(filename)
     morphs.process()
