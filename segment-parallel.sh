@@ -7,20 +7,20 @@ read corpus
 echo "Enter paralell corpus languages separated by a dash"
 read paral
 
-unzip "/var/tmp/${corpus}-${paral}.txt.zip"
+unzip "/var/tmp/${corpus}-${paral}.txt.zip" -d /var/tmp
 
 if [[ $corpus == "ep" ]];
 then
-    DATA_SOURCE="Europarl.${paral}.${lang}"
+    DATA_SOURCE="/var/tmp/Europarl.${paral}.${lang}"
 	#DATA_SOURCE="Europarl.raw.${lang}.gz"
     URL="http://opus.lingfil.uu.se/download.php?f=Europarl/mono/Europarl.raw.${lang}.gz"
 elif [[ $corpus == "dgt" ]]; then
 	#DATA_SOURCE="DGT.raw.${lang}.gz"
-    DATA_SOURCE="DGT.${paral}.${lang}"
+    DATA_SOURCE="/var/tmp/DGT.${paral}.${lang}"
 	URL="http://opus.lingfil.uu.se/download.php?f=DGT/mono/DGT.raw.{lang}.gz"
 elif [[ $corpus == "os" ]]; then
     #DATA_SOURCE="/tmp/OpenSubtitles2016.raw.${lang}.gz"
-	DATA_SOURCE="OpenSubtitles2016.${paral}.${lang}"
+	DATA_SOURCE="/var/tmp/OpenSubtitles2016.${paral}.${lang}"
     URL="http://opus.lingfil.uu.se/download.php?f=OpenSubtitles2016/mono/OpenSubtitles2016.raw.{lang}.gz"
 else
     echo "Corpus not found!"
