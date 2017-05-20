@@ -33,18 +33,20 @@ class SubWordUnits:
     def process(self):
 
         # no split non-numeric morphs only
-        p0 = re.compile("^[^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+$", re.M)
+        p0 = re.compile("^[^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+$", re.M)
         # one split non-numeric morphs only
-        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
+        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+)$", re.M)
         # 2 plus non-numeric morphs only
-        p2p = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+\s)+$", re.M)
+        p2p = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+\s)+$", re.M)
 
         with open(self.segments_file_in, 'rt') as f:
             for word in f:
 
+                # Preprocess/normalize string:
+                # remove spaces and capitalization
                 word = word.lower()
-
-                self.all_words[word.rstrip()] += 1       # total count of words
+                orig_word = '-'.join(word.split())
+                self.all_words[orig_word] += 1       # total count of words
 
                 # Already seen word, skip?
                 if word in self.processed_words:
@@ -59,46 +61,6 @@ class SubWordUnits:
                 # Find 2+ split words and add morphs to either prefix,
                 match2p = re.match(p2p, word)
 
-                # if match0:
-                #     m = match0.group(0)
-                #     print("no split: ", repr(m))
-                #     self.no_split_words.append(m)
-
-                # suffix, or stem dictionaries,
-                # only if the size of one of the morphs is at least
-                # twice as large as the other
-                # elif match1:
-                #     print("found one split")
-                #     m1 = match1.group(1)
-                #     print("m1: ", repr(m1))
-                #
-                #     m2 = match1.group(2)
-                #     print("m2: ", repr(m2))
-                #
-                # # morphs = word.rstrip().split()
-                # # if len(morphs) == 1:
-                # #     self.all_other_words.add(morphs[0])
-                # # elif len(morphs) == 2:
-                # #     m1 = morphs[0]
-                # #     m2 = morphs[1]
-                #     if max(len(m1) / len(m2), len(m2) / len(m1)) >= 2:
-                #         if len(m1) > len(m2):
-                #             stem = m1
-                #             suffix = m2
-                #             # self.stems.add(stem)
-                #             # self.suffixes.add(suffix)
-                #             self.stems.append(stem)
-                #             self.suffixes.append(suffix)
-                #         else:
-                #             prefix = m1
-                #             stem = m2
-                #             # self.prefixes.add(prefix)
-                #             # self.stems.add(stem)
-                #             self.prefixes.append(prefix)
-                #             self.stems.append(stem)
-                #
-                #     else:   # affix not long enough
-                #         self.other_one_split_words.append(word)      # add one-split word to process later
 
                 if match2p:
                     #print("2+ split?")
@@ -242,7 +204,7 @@ class SubWordUnits:
         #print('reprocessing one split')
 
         # one split non-numeric morphs only
-        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
+        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+)$", re.M)
 
         # Iterate through one split words and map to signature
         # prefix-stem (p-s)
@@ -287,7 +249,7 @@ class SubWordUnits:
     def reprocess_2plus_words(self):
 
         # one split non-numeric morphs only
-        p2p = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+\s)+$", re.M)
+        p2p = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+\s)+$", re.M)
 
         with open(self.segments_file_in, 'rt') as f:
             for word in f:
@@ -295,7 +257,7 @@ class SubWordUnits:
                 word = word.lower()
 
                 # Already seen word, skip
-                if word in self.processed_words:
+                if word in self.processed_words or word == '\n':
                     continue
 
                 # Find 2+ split words and add morphs to either prefix,
@@ -313,7 +275,8 @@ class SubWordUnits:
 
                     signature = ''
                     for m in morphs:
-                        if m in self.prefixes:
+                        if m in self.prefixes and \
+                            's' not in signature and 'e' not in signature:
                             # self.prefixes.append(m)
                             self.prefixes[m] += 1
                             signature += '-p' if signature else 'p'
@@ -324,7 +287,8 @@ class SubWordUnits:
                             signature += '-e' if signature else 'e'
 
                             #print('suffix ', m)
-                        elif m in self.stems:
+                        elif m in self.stems and \
+                             'e' not in signature:
                             # self.stems.append(m)
                             self.stems[m] += 1
                             signature += '-s' if signature else 's'
@@ -333,6 +297,18 @@ class SubWordUnits:
                         else:       # morph not known, so mark with '?'
                             signature += '-?' if signature else '?'
 
+                    if 's' not in signature:
+                        signature = 'no-stem'
+
+                    # Count unknowns ('?') in signature
+                    cnt = 0
+                    for ch in signature:
+                        if ch == '?':
+                            cnt += 1
+
+                    if cnt > 3:
+                        signature = 'indeter'
+                    #print(cnt)
                     # Add word to list of processed words
                     hyphen_word = '-'.join(morphs)
                     self.signatures[signature].append(hyphen_word)
@@ -351,7 +327,7 @@ class SubWordUnits:
         #print('adjusting boundary for one split')
 
         # one split non-numeric morphs only
-        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
+        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+)$", re.M)
 
         # Iterate through one split words and map to signature
         # prefix-stem (p-s)
@@ -451,7 +427,7 @@ class SubWordUnits:
         #print('readjusting one split')
 
         # one split non-numeric morphs only
-        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*]+)$", re.M)
+        p1 = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+) ([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+)$", re.M)
 
         # Iterate through one split words and map to signature
         # prefix-stem (p-s)
@@ -588,13 +564,19 @@ class SubWordUnits:
             for m, cnt in self.suffixes.items():
                 f_out.write(str(cnt) + '\t' + m + '\n')
 
-        # Writes signature (mapping)
+        # Write signature (mapping)
         with open('signatures' + dict_file_suffix, 'w') as f_out:
             for signature, words in self.signatures.items():
                 f_out.write('\n')
                 f_out.write(str(signature) + '(' + str(words) + ')' + '\n')
 
-        # Writes stats
+        # Write lexicon (all words)
+        with open('dictionary' + dict_file_suffix, 'w') as f_out:
+            for word, freq in self.all_words.items():
+                f_out.write(word + '\t' + str(freq) + '\n')
+
+
+        # Write stats
         with open('stats' + dict_file_suffix, 'w') as f_out:
             for signature, words in self.signatures.items():
                 N = len(self.all_words)
@@ -609,7 +591,7 @@ class SubWordUnits:
 
 # MAIN
 # Get all segments files
-filenames = glob.glob('minicorpus*')
+filenames = glob.glob('segments*')
 for filename in filenames:
     morphs = SubWordUnits(filename)
     morphs.process()
@@ -630,13 +612,23 @@ for filename in filenames:
     #print(morphs.prefixes)
     #print(morphs.stems)
     #print(morphs.suffixes)
-    morphs.reprocess_known_one_split()
+
+    # Lax condition that both morphs be
+    # in dictionaries, to only one, e.g.
+    # prefix or stem -> p-s
+    # uncomment to use
+    #morphs.reprocess_known_one_split()
+
     #print(morphs.signatures)
     #print(morphs.processed_words)
     #print(morphs.prefixes)
     #print(morphs.stems)
     #print(morphs.suffixes)
-    morphs.readjust_boundary_one_split()
+
+    # Uncomment here to lax boundary
+    # adjustment
+    #morphs.readjust_boundary_one_split()
+
     #print(morphs.signatures)
     #print(morphs.processed_words)
     #print(morphs.prefixes)
@@ -911,3 +903,44 @@ for filename in filenames:
 #                     prefixes.add(prefix)
 #                     stems.add(stem)
 
+
+# if match0:
+                #     m = match0.group(0)
+                #     print("no split: ", repr(m))
+                #     self.no_split_words.append(m)
+
+                # suffix, or stem dictionaries,
+                # only if the size of one of the morphs is at least
+                # twice as large as the other
+                # elif match1:
+                #     print("found one split")
+                #     m1 = match1.group(1)
+                #     print("m1: ", repr(m1))
+                #
+                #     m2 = match1.group(2)
+                #     print("m2: ", repr(m2))
+                #
+                # # morphs = word.rstrip().split()
+                # # if len(morphs) == 1:
+                # #     self.all_other_words.add(morphs[0])
+                # # elif len(morphs) == 2:
+                # #     m1 = morphs[0]
+                # #     m2 = morphs[1]
+                #     if max(len(m1) / len(m2), len(m2) / len(m1)) >= 2:
+                #         if len(m1) > len(m2):
+                #             stem = m1
+                #             suffix = m2
+                #             # self.stems.add(stem)
+                #             # self.suffixes.add(suffix)
+                #             self.stems.append(stem)
+                #             self.suffixes.append(suffix)
+                #         else:
+                #             prefix = m1
+                #             stem = m2
+                #             # self.prefixes.add(prefix)
+                #             # self.stems.add(stem)
+                #             self.prefixes.append(prefix)
+                #             self.stems.append(stem)
+                #
+                #     else:   # affix not long enough
+                #         self.other_one_split_words.append(word)      # add one-split word to process later
