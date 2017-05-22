@@ -32,7 +32,8 @@ class SubWordUnits:
         self._signatures = defaultdict(list)    # {signature: [words]}
         self.processed_words = set([])
         self.adjusted_words = {}                # {orig_word: adjusted_word}
-        self.LABELS = {'p': 'prefixes', 's': 'stems', 'e': 'endings', '?': 'unknown'}
+        self.LABELS = {'p': 'prefixes', 's': 'stems', 'e': 'suffixes', '?': 'unknown'}
+
 
     def process(self):
         """
@@ -112,7 +113,7 @@ class SubWordUnits:
                 # and change affixes to defaultdict with counts?
                 signature = ''
                 if is_stem_2X:
-                    print('stem is 2X for ', morphs)
+                    #print('stem is 2X for ', morphs)
                     max_i = morphs.index(max_len_morph)
                     for i, m in enumerate(morphs):
                         if i < max_i:
@@ -137,7 +138,7 @@ class SubWordUnits:
                     self.signatures[signature].append(orig_word)
                     self.processed_words.add(orig_word)
 
-        print('processed words ', self.processed_words)
+        #print('processed words ', self.processed_words)
 
     def process_known_one_split(self):
 
@@ -488,8 +489,8 @@ class SubWordUnits:
             signature = new_sig
             #print('new sig', new_sig)
 
-        else:
-            signature = 'no-stem'
+        # else:
+        #     signature = 'no-stem'
 
         # Count unknowns ('?') in signature
         cnt = 0
@@ -1002,15 +1003,18 @@ class SubWordUnits:
                 #f_out.write('raw count: ' + str(n) + '\n')
                 #f_out.write('out of total: ' + str(N) + '\n')
                 #f_out.write('frequency: ' + str(freq) + '\n\n')
+                print(signature, V)
 
         with open('stats-token' + dict_file_suffix, 'w') as f_out:
             N = sum(self.all_words.values())     # text size/number of tokens
+            print('total tokens', N)
             for signature, words in self.signatures.items():
                 counts = 0
                 for word in words:
                     if word in self.adjusted_words:
                         word = self.adjusted_words[word]    # lookup original word before adjustment
                     counts += self.all_words[word]
+                print(signature, counts)
                 #counts = sum([self.all_words[w] for w in words])
                 #raw_cnt = len(words)
                 freq = round(counts / N, 3)
