@@ -722,13 +722,13 @@ class SubWordUnits:
                 # morpheme missed in the first pass
 
             old_morphs = word.split('-')
-            print(old_morphs)
+            # print(old_morphs)
             n = len(old_morphs)
             #word = ''.join(morphs)
             new_morphs = [old_morphs[0]]
             has_shift = False
             for i in range(0, n - 1):
-                print("new interation: ", new_morphs)
+                # print("new interation: ", new_morphs)
 
                 is_valid = False
                 # Original morphs
@@ -759,8 +759,8 @@ class SubWordUnits:
                 has_shift = True
                 new_m1 = m1 + m2[0]
                 new_m2 = m2[1:]
-                print("new m1: ", new_m1)
-                print("new m2: ", new_m2)
+                # print("new m1: ", new_m1)
+                # print("new m2: ", new_m2)
 
                 # candidates = new_morphs + [new_m1, new_m2]
 
@@ -777,12 +777,12 @@ class SubWordUnits:
                 # print('shifting rt')
                 new_m1 = m1[:-1]
                 new_m2 = m1[-1] + m2
-                print("new m1: ", new_m1)
-                print("new m2: ", new_m2)
+                # print("new m1: ", new_m1)
+                # print("new m2: ", new_m2)
 
                 # Get candidates
                 candidates =self.get_candidates(new_m1, new_m2, new_morphs)
-                print('last chance for cands ', candidates)
+                # print('last chance for cands ', candidates)
 
                 # Is this a valid shift (are both morphs now known)?
                 # If so, do shift and add both morphs to the stack
@@ -790,7 +790,7 @@ class SubWordUnits:
                 new_morphs = list(candidates)
                 if self.valid_shift(candidates[:-1]):
                     is_valid = True
-                    print('is valid for ', new_morphs)
+                    # print('is valid for ', new_morphs)
                     continue
 
                 # Otherwise, keep old morphs and abort for this word
@@ -806,8 +806,8 @@ class SubWordUnits:
                 new_signature = self.get_signature(new_morphs)
                 adj_word = '-'.join(new_morphs)
                 word_count = self.all_words[word]
-                print('a valid shift found for ', new_morphs)
-                print("final word", adj_word, new_signature)
+                # print('a valid shift found for ', new_morphs)
+                # print("final word", adj_word, new_signature)
 
                 self.signatures[new_signature].append(adj_word)
                 self.adjusted_words[adj_word] = word
@@ -977,7 +977,7 @@ class SubWordUnits:
         """
 
         cand_sig = self.get_signature(candidates)
-        print(candidates, cand_sig)
+        #print(candidates, cand_sig)
         if '?' not in cand_sig:
             return True
 
