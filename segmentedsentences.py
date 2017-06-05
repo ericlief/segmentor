@@ -11,10 +11,15 @@ from nltk.tokenize import wordpunct_tokenize
 
 
 class SegmentedSentences:
-
+    """
+    A SegmentedSentences object which encapsulates
+    several different internal (segmental) representation of all sentences
+    of a sentence tokenized text, which can be used in
+    MT.
+    """
     def __init__(self, model, file):
-        self.model = model
-        self.segmented_sents = self.segment_sentences(file)
+        self.model = model                                      # MorphModel
+        self.segmented_sents = self.segment_sentences(file)     # list(SegmentedSentences)
 
     def segment_sentences(self, file):
 
@@ -80,13 +85,19 @@ class SegmentedSentences:
 
 
 class SegmentedSent:
+    """
+    A SegmentedSentence object which encapsulates
+    several different internal representation of splits (segments)
+    of a given sentence
+    """
+
     def __init__(self, words, model):
-        self._words = words
-        self.model = model
+        self._words = words     # return words
+        self.model = model      # MorphModel
         self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
         self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                       # 'the  boy s   chase d   the   girl s'
-        self._segments_with_space_symbol = self._segmented_sent_repr.split()
-        self._segments_no_space_symbol = []
+        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '<separ>'. 'boy', 's' '<separ>'...] ◽
+        self._segments_no_space_symbol = []                                                  # ['the', 'boy', 's'...]
         for word in words:
             segments = self.model.segment_word(word)
             self._segments_no_space_symbol += segments

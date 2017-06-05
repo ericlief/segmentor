@@ -3,6 +3,11 @@
 
 """
 Project: segmentor
+
+Main method for testing the MorphModel class.
+The training files can be batch processed
+by their Morfessor 'segments-' prefixed filenames.
+
 Created on 30.05.17
 @author: Eric Lief
 """
@@ -17,8 +22,8 @@ if __name__ == "__main__":
     # Get all segments files
     #filenames = glob.glob('segments*')
 
-    #test = ['segments-test.txt']
-    filenames = ['segments-ep.cs-en.en.txt', 'segments-ep.cs-en.cs.txt']
+    #test = ['segments-test.txt'] 'segments-ep.cs-en.en.txt',
+    filenames = ['segments-ep.cs-en.cs.txt']
     # dict_file_suffix = self.segments_file_in[8:]
     # abbrev_fn = self.segments_file_in[9:-3]
 
@@ -60,10 +65,11 @@ if __name__ == "__main__":
             for sent in repr:
                 f_out.write(str(sent) + '\n')
 
-                            # print(segmented_sents.words())
+
+        # print(segmented_sents.words())
         # print(segmented_sents.segmented_words())
         # print(segmented_sents.segments_space_symbol())
         # print(segmented_sents.segments_no_space_symbol())
-        #
+
 
 
