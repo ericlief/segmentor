@@ -9,22 +9,18 @@ Created on 17.03.17
 
 import io
 import sys
-import numpy as np
+# import numpy as np
 from collections import Counter, defaultdict
-from alignedsentence import *
-
-# def EM(S):
-#     pass
-
-"""
-Source: EN
-Target : CZ
-"""
+# from alignedsentence import *
 
 
 class IBMModel1():
+    """
+    Source: EN
+    Target : CZ
+    """
 
-    def __init__(self, aligned_sents, iters):
+    def __init__(self, aligned_sents, iters, thresh):
         self.src_vocab = set()
         self.target_vocab = set()
 
@@ -45,11 +41,23 @@ class IBMModel1():
         # Train using EM algorithm
         self.train(aligned_sents, iters)
 
-        print(self.trans_table)
+        # print(self.trans_table)
 
-        sent_align = self.get_alignments(aligned_sents)
+        # Get best alignements (max of all)
+        # sent_align = self.get_alignments(aligned_sents)
+        # for align in sent_align:
+        #     print(align)
+
+        # Get all alignments above threshold
+        # print("all alignments above threshold = ", thresh)
+        sent_align = self.get_alignments_threshold(aligned_sents, thresh)
         for align in sent_align:
-            print(align)
+            res = ''
+            for j, i in align:
+                res += str(j) + '-' + str(i) + ' '
+            print(res)
+        self._sent_align = sent_align
+
 
     def train(self, aligned_sents, iters):
 
@@ -65,9 +73,14 @@ class IBMModel1():
 
                 # Normalize (E-step)
                 for e in sent.words:  # not sure if to add the null
-                    if total_count[e] == 0.0:
+                    if total_count[e] == 0.0:   # only count one unique word per sentence
                         for f in sent.mots:
                             total_count[e] += self.trans_table[e][f]
+
+                # Normalize (E-step)
+                # for e in sent.words:  # not sure if to add the null
+                #     for f in sent.mots:
+                #         total_count[e] += self.trans_table[e][f]
 
                 # Collect counts (E-step)
                 for e in sent.words:
@@ -82,8 +95,8 @@ class IBMModel1():
                 for e in self.target_vocab:
                     self.trans_table[e][f] = count_e_f[e][f] / total_f[f]
 
-                    print('iter  ', i+1)
-                    print(e,f,self.trans_table[e][f])
+                    # print('iter  ', i+1)
+                    # print(e,f,self.trans_table[e][f])
 
             i += 1
 
@@ -96,12 +109,95 @@ class IBMModel1():
                 best_align_pos = None
                 for i, f in enumerate(sent.mots):
                     prob = self.trans_table[e][f]
-                    if self.trans_table[e][f] > max_p:
+                    if prob >= max_p:
                         max_p = prob
                         best_align_pos = i
                 sent_alignments.append((j, best_align_pos))
             all_sent_alignments.append(sent_alignments)
         return all_sent_alignments
+
+    def get_alignments_threshold(self, aligned_sents, thresh):
+        all_sent_alignments = []
+        for sent in aligned_sents:
+            sent_alignments = []
+            for j, e in enumerate(sent.words):
+                # max_p = 0.0
+                # best_align_pos = None
+                for i, f in enumerate(sent.mots):
+                    prob = self.trans_table[e][f]
+                    if prob > thresh:
+                        # max_p = prob
+                        # best_align_pos = i
+                        # print(j,i,prob)
+                # if best_align_pos:
+                        sent_alignments.append((j, i))
+            all_sent_alignments.append(sent_alignments)
+        return all_sent_alignments
+
+    def get_alignments_threshold2(self, aligned_sents, thresh):
+        all_sent_alignments = []
+        for sent in aligned_sents:
+            sent_alignments = []
+            for j, e in enumerate(sent.words):
+                max_p = 0.0
+                best_align_pos = None
+                for i, f in enumerate(sent.mots):
+                    prob = self.trans_table[e][f]
+                    if prob >= max_p and prob > thresh:
+                        max_p = prob
+                        best_align_pos = i
+                        # print(j,i,prob)
+                if best_align_pos:
+                    sent_alignments.append((j, best_align_pos))
+            all_sent_alignments.append(sent_alignments)
+        return all_sent_alignments
+
+    def write_alignments(self, file):
+        # Get best alignements (max of all)
+        # sent_align = self.get_alignments(aligned_sents)
+        # for align in sent_align:
+        #     print(align)
+
+        # Get all alignments above threshold
+        # print("all alignments above threshold = ", thresh)
+        # sent_align = self.get_alignments_threshold(aligned_sents, thresh)
+
+        with open(file, 'w') as f:
+
+            for align in self._sent_align:
+                res = ''
+                for j, i in align:
+                    res += str(j) + '-' + str(i) + ' '
+                    # print(res)
+                    f.write(res + '\n')
+
+class AlignedSentence:
+    """
+    A simple AlignedSentence object which encapsulates
+    two sentences and the alginment between them
+    """
+
+    def __init__(self, words, mots, alignment=None):
+        self._words = words                 # source language words
+        self._mots = mots                   # target language words
+        self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+
+    @property
+    def words(self):
+        return self._words
+
+    @property
+    def mots(self):
+        return self._mots
+
+
+    @property
+    def alignment(self):
+        return self._alignment
+
+    @alignment.setter
+    def aligment(self, alignment):
+        self._alignment = alignment
 
 if __name__ == "__main__":
     stream = io.TextIOWrapper(sys.stdin.buffer)
@@ -141,9 +237,10 @@ if __name__ == "__main__":
     except IOError:
         sys.stderr.write('Problem with input format.')
 
-    model = IBMModel1(aligned_sents, iters)
+    model = IBMModel1(aligned_sents, iters, thresh)
 
-
+    # for alignment in model.get_alignments()
+    #
 
 
     #for pair in pairs:

@@ -17,7 +17,7 @@ class AlignedSentence:
     def __init__(self, words, mots, alignment=None):
         self._words = words                 # source language words
         self._mots = mots                   # target language words
-        self.alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
 
     @property
     def words(self):
