@@ -8,7 +8,8 @@ Created on 07.05.17
 @author: Eric Lief
 """
 
-import regex as re
+# import regex as re
+import re
 from collections import defaultdict
 
 class MorphModel:
@@ -125,6 +126,7 @@ class MorphModel:
                     self.signatures[signature].append(split_word)
                     self.processed_words.add(split_word)
                     self.words_to_segments[orig_word] = morphs
+                    # self.word_to_signature[]
                     #print(split_word, morphs)
 
         #print('processed words ', self.processed_words)

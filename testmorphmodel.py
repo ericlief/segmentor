@@ -44,8 +44,8 @@ if __name__ == "__main__":
         #segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_cs = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_cs[-13:-4])
         # segmented_sents_cs = SegmentedSentences(model, 'Europarl' + filename_cs[-13:-4])
-        # segmented_sents_cs = SegmentedSentences(model, 'small_cz')
-        segmented_sents_cs = SegmentedSentences(model, 'large_cz')
+        segmented_sents_cs = SegmentedSentences(model, 'small_cz')
+        # segmented_sents_cs = SegmentedSentences(model, 'large_cz')
 
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
         print(segmented_sents_cs)
@@ -63,8 +63,8 @@ if __name__ == "__main__":
         # segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_en = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_en[-13:-4])
         # segmented_sents_en = SegmentedSentences(model, 'Europarl' + filename_en[-13:-4])
-        # segmented_sents_en = SegmentedSentences(model, 'small_en')
-        segmented_sents_en = SegmentedSentences(model, 'large_en')
+        segmented_sents_en = SegmentedSentences(model, 'small_en')
+        # segmented_sents_en = SegmentedSentences(model, 'large_en')
         # segmented_sents_en = SegmentedSentences(model, 'test_en')
 
         #f = 'Europarl.cs-en.en'
@@ -78,16 +78,23 @@ if __name__ == "__main__":
         # segs_spaces_en = segmented_sents_en.segments_space_symbol()
         # segs_no_space = segmented_sents.segments_no_space_symbol()
 
-        aligned_sentences = []
+        aligned_sentences_e2f = []
+        aligned_sentences_f2e = []
+
         for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
             # aligned_sent = AlignedSentence(sent_e, sent_f)
             aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
-            aligned_sentences.append(aligned_sent)
+            aligned_sentences_e2f.append(aligned_sent)
+
+            aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
+            aligned_sentences_f2e.append(aligned_sent)
 
         iters = 20
         thresh = .30
         file = 'aligned_sents' + filename_cs[-15:-7]
-        model = IBM1(aligned_sentences, iters, thresh, output='output_alignments_large.txt')
+        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
+        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
+
         # model.write_alignments(file)
 
         # for sent in segs_spaces_cs:
@@ -113,6 +120,7 @@ if __name__ == "__main__":
         # print(segmented_sents.segments_space_symbol())
         # print(segmented_sents.segments_no_space_symbol())
 
+        # print(segmented_sents.segments_space_symbol())
 
 
 

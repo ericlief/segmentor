@@ -116,6 +116,35 @@ class IBM1:
 
             i += 1
 
+    # def get_alignments_forward(self, aligned_sents):
+    #     all_sent_alignments = []
+    #     for sent in aligned_sents:
+    #         forward = []
+    #         for j, e in enumerate(sent.words):
+    #             max_p = 0.0
+    #             best_align_pos = None
+    #             for i, f in enumerate(sent.mots):
+    #                 prob = self.trans_table[e][f]
+    #                 if prob >= max_p:
+    #                     max_p = prob
+    #                     best_align_pos = i
+    #             forward.append((j, best_align_pos))
+    #
+    #         backward = []
+    #         for j, f in enumerate(sent.mots):
+    #             max_p = 0.0
+    #             best_align_pos = None
+    #             for i, e in enumerate(sent.words):
+    #                 prob = self.trans_table[e][f]
+    #                 if prob >= max_p:
+    #                     max_p = prob
+    #                     best_align_pos = i
+    #             forward.append((j, best_align_pos))
+    #         # sent._alignment = sent_alignments
+    #         all_sent_alignments.append(sent_alignments)
+    #     return all_sent_alignments
+
+
     def get_alignments(self, aligned_sents):
         # all_sent_alignments = []
         for sent in aligned_sents:
@@ -129,27 +158,9 @@ class IBM1:
                         max_p = prob
                         best_align_pos = i
                 sent_alignments.append((j, best_align_pos))
-            sent._alignment = sent_alignments
+            sent.alignment = sent_alignments
             # all_sent_alignments.append(sent_alignments)
         # return all_sent_alignments
-
-    #
-    # def get_alignments(self, aligned_sents):
-    #     all_sent_alignments = []
-    #     for sent in aligned_sents:
-    #         sent_alignments = []
-    #         for j, e in enumerate(sent.words):
-    #             max_p = 0.0
-    #             best_align_pos = None
-    #             for i, f in enumerate(sent.mots):
-    #                 prob = self.trans_table[e][f]
-    #                 if prob >= max_p:
-    #                     max_p = prob
-    #                     best_align_pos = i
-    #             sent_alignments.append((j, best_align_pos))
-    #         sent.alignment = sent_alignments
-    #         all_sent_alignments.append(sent_alignments)
-    #     return all_sent_alignments
 
     def get_alignments_threshold(self, aligned_sents, thresh):
         all_sent_alignments = []
