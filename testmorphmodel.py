@@ -43,7 +43,12 @@ if __name__ == "__main__":
         # segmented_sents = SegmentedSentences(model, 'cs-en.txt/Europarl' + filename[-13:-4])
         #segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_cs = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_cs[-13:-4])
-        segmented_sents_cs = SegmentedSentences(model, 'Europarl' + filename_cs[-13:-4])
+        # segmented_sents_cs = SegmentedSentences(model, 'Europarl' + filename_cs[-13:-4])
+        # segmented_sents_cs = SegmentedSentences(model, 'small_cz')
+        segmented_sents_cs = SegmentedSentences(model, 'large_cz')
+
+        # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
+        print(segmented_sents_cs)
 
     for filename_en in filenames_en:
         # Train model
@@ -57,7 +62,10 @@ if __name__ == "__main__":
         # segmented_sents = SegmentedSentences(model, 'cs-en.txt/Europarl' + filename[-13:-4])
         # segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_en = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_en[-13:-4])
-        segmented_sents_en = SegmentedSentences(model, 'Europarl' + filename_en[-13:-4])
+        # segmented_sents_en = SegmentedSentences(model, 'Europarl' + filename_en[-13:-4])
+        # segmented_sents_en = SegmentedSentences(model, 'small_en')
+        segmented_sents_en = SegmentedSentences(model, 'large_en')
+        # segmented_sents_en = SegmentedSentences(model, 'test_en')
 
         #f = 'Europarl.cs-en.en'
 
@@ -66,20 +74,21 @@ if __name__ == "__main__":
         #with open('test-segmented-sents.txt', 'w') as f_out:
                 # words = segmented_sents.words()
                 # segmented_words = segmented_sents.segmented_words()
-        segs_spaces_cs = segmented_sents_cs.segments_space_symbol()
-        segs_spaces_en = segmented_sents_en.segments_space_symbol()
+        # segs_spaces_cs = segmented_sents_cs.segments_space_symbol()
+        # segs_spaces_en = segmented_sents_en.segments_space_symbol()
         # segs_no_space = segmented_sents.segments_no_space_symbol()
 
         aligned_sentences = []
-        for sent_e, sent_f in zip(segmented_sents_en, segmented_sents_cs):
-            aligned_sent = AlignedSentence(sent_e, sent_f)
+        for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
+            # aligned_sent = AlignedSentence(sent_e, sent_f)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
             aligned_sentences.append(aligned_sent)
 
-        iters = 10
-        thres = .30
+        iters = 20
+        thresh = .30
         file = 'aligned_sents' + filename_cs[-15:-7]
-        model = IBMModel1(aligned_sentences, iters, thresh)
-        model.write_alignments(file)
+        model = IBM1(aligned_sentences, iters, thresh, output='output_alignments_large.txt')
+        # model.write_alignments(file)
 
         # for sent in segs_spaces_cs:
         #
