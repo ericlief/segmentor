@@ -101,8 +101,12 @@ def grow_diag_final_and(srclen, trglen, e2f, f2e):
         while prev_len < len(alignment):
             # for english word e = 0 ... en
             for e in range(srclen):
+            # for e in range(trglen):
+
                 # for foreign word f = 0 ... fn
+                # for f in range(srclen):
                 for f in range(trglen):
+
                     # if ( e aligned with f)
                     if (e, f) in alignment:
                         # for each neighboring point (e-new, f-new)
@@ -124,21 +128,26 @@ def grow_diag_final_and(srclen, trglen, e2f, f2e):
         neighboring alignments but in the original *e2f* and *f2e* alignments
         """
         # for english word e = 0 ... en
+        # for e_new in range(trglen):
         for e_new in range(srclen):
+
             # for foreign word f = 0 ... fn
+            # for f_new in range(srclen):
             for f_new in range(trglen):
+
                 # if ( ( e-new not aligned and f-new not aligned)
                 # and (e-new, f-new in union(e2f, f2e) )
                 if (e_new not in aligned
                     and f_new not in aligned
                     and (e_new, f_new) in a):
                     alignment.add((e_new, f_new))
-                    aligned['e'].add(e_new);
+                    aligned['e'].add(e_new)
                     aligned['f'].add(f_new)
 
     grow_diag()
     final_and(e2f)
     final_and(f2e)
+
     return alignment
 
 if __name__ == "__main__":
@@ -231,36 +240,55 @@ if __name__ == "__main__":
 
             e2f_sents = model_e2f.aligned_sents
             f2e_sents = model_f2e.aligned_sents
-            for k, e_sent in enumerate(e2f_sents):
+            # for k, e_sent in enumerate(e2f_sents):
+            for k, e_sent in enumerate(f2e_sents):
 
                 # Convert alignements to string representation
                 e2f_str = ''
                 e2f = e_sent.alignment
+                # e2f = e_sent.inverse_alignment() # inverse?
+
                 for j, i in e2f:
                     e2f_str += str(j) + '-' + str(i) + ' '
 
                 f2e_str = ''
-                f_sent = f2e_sents[k]
-                
+                # f_sent = f2e_sents[k]
+                f_sent = e2f_sents[k]
+
                 f2e = f_sent.inverse_alignment()
+                # f2e = f_sent.alignment
                 for j, i in f2e:
                     f2e_str += str(j) + '-' + str(i) + ' '
 
                 # Get intersection, convert to string
                 int_str = ''
                 intersection = set(e2f).intersection(set(f2e))
+                # intersection = set(f2e).intersection(set(e2f))
+
                 for j, i in intersection:
                     int_str += str(j) + '-' + str(i) + ' '
 
+                # Symmetrization of bidirectional alignment (Cohn)
+                srclen = len(e_sent.mots)       # len of src sentence (f)
+                trglen = len(e_sent.words)      # len of tar sentence (e)
+                # trglen = len(e_sent.mots)  # len of src sentence (f)
+                # srclen = len(e_sent.words)  # len of tar sentence (e)
 
-                grow_diag_final_and(srclen, trglen, e2f, f2e)
+                sym_align = grow_diag_final_and(srclen, trglen, e2f, f2e)
+                # sym_align = grow_diag_final_and(srclen, trglen, f2e, e2f)
+                sym_str = ''
+                for j, i in sym_align:
+                    sym_str += str(j) + '-' + str(i) + ' '
 
                 # Write
-                f.write('\t'.join(a_sent.words) + '\n')
-                f.write('\t'.join(a_sent.mots) + '\n')
+                f.write('\t'.join(e_sent.words) + '\n')
+                f.write('\t'.join(e_sent.mots) + '\n')
                 f.write(e2f_str + '\n')
                 f.write(f2e_str + '\n')
+                f.write('intersection\n')
                 f.write(int_str + '\n')
+                f.write('symmetrization\n')
+                f.write(sym_str + '\n')
 
 
 
