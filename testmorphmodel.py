@@ -89,13 +89,54 @@ if __name__ == "__main__":
             aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
             aligned_sentences_f2e.append(aligned_sent)
 
+        # Train both forward and backward models
         iters = 20
         thresh = .30
-        file = 'aligned_sents' + filename_cs[-15:-7]
+        file = 'aligned_sents-' + filename_cs[-15:-8]
         model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
         model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
 
-        # model.write_alignments(file)
+
+        # e2f_alignments = [sent.alignment for sent in e2f_sents]
+        # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
+        # alignments = [set(e2f).intersection(set(f2e)) for (e2f, f2e) in zip(e2f_alignments, f2e_alignments)]
+
+
+        with open(file, 'w') as f:
+
+            # Symmetricize alignements by taking intersection
+
+            e2f_sents = model_e2f.aligned_sents
+            f2e_sents = model_f2e.aligned_sents
+            for k, a_sent in enumerate(e2f_sents):
+
+                # Convert alignements to string representation
+                e2f_str = ''
+                e2f = a_sent.alignment
+                for j, i in e2f:
+                    e2f_str += str(j) + '-' + str(i) + ' '
+
+                f2e_str = ''
+                f2e = f2e_sents[k].inverse_alignment()
+                for j, i in f2e:
+                    f2e_str += str(j) + '-' + str(i) + ' '
+
+                # Get intersection, convert to string
+                int_str = ''
+                intersection = set(e2f).intersection(set(f2e))
+                for j, i in intersection:
+                    int_str += str(j) + '-' + str(i) + ' '
+
+                # Write
+                f.write('\t'.join(a_sent.words) + '\n')
+                f.write('\t'.join(a_sent.mots) + '\n')
+                f.write(e2f_str + '\n')
+                f.write(f2e_str + '\n')
+                f.write(int_str + '\n')
+
+
+
+                    # model.write_alignments(file)
 
         # for sent in segs_spaces_cs:
         #

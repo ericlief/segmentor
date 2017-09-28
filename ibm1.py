@@ -62,6 +62,9 @@ class IBM1:
             print(res)
 
         # self._sent_align = sent_align
+
+        # Save alignments, write
+        self.aligned_sents = aligned_sents
         self.write_alignments(output, aligned_sents)
 
         # Get all alignments above threshold
