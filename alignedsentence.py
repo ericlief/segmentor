@@ -7,6 +7,7 @@ Created on 29.05.17
 @author: Eric Lief
 """
 
+from segmentedsentences import *
 
 class AlignedSentence:
     """
@@ -15,9 +16,35 @@ class AlignedSentence:
     """
 
     def __init__(self, words, mots, alignment=None):
-        self._words = words                 # source language words
-        self._mots = mots                   # target language words
-        self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        self._words = words                 # tar language words
+        self._mots = mots                   # src language words
+        self.alignment = alignment         # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+
+    @classmethod
+    def from_segmented_sent_to_words(cls, segmented_sent_tar, segmented_sent_src):
+        words = segmented_sent_tar.segmented_words                 # source language words
+        mots = segmented_sent_src.segmented_words                  # target language words
+        # self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        # aligned_sent = AlignedSentence(sent_e, sent_f)
+        # aligned_sentences.append(aligned_sent)
+        return cls(words, mots)
+
+    @classmethod
+    def from_segmented_sent_to_segments_with_space_symbol(cls, segmented_sent_tar, segmented_sent_src):
+        words = segmented_sent_tar.segments_with_space_symbol  # source language words
+        mots = segmented_sent_src.segments_with_space_symbol  # target language words
+        # self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        # aligned_sent = AlignedSentence(sent_e, sent_f)
+        # aligned_sentences.append(aligned_sent)
+        return cls(words, mots)
+
+    def inverse_alignment(self):
+        """
+        Utility method for alignment symmetrization.
+        :return: inverse alignemnt
+        """
+        if self.alignment:
+            return [(f, e) for (e, f) in self.alignment]
 
     @property
     def words(self):
@@ -28,10 +55,10 @@ class AlignedSentence:
         return self._mots
 
 
-    @property
-    def alignment(self):
-        return self._alignment
-
-    @alignment.setter
-    def aligment(self, alignment):
-        self._alignment = alignment
+    # @property
+    # def alignment(self):
+    #     return self._alignment
+    #
+    # @alignment.setter
+    # def aligment(self, alignment):
+    #     self._alignment = alignment

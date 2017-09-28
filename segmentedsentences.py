@@ -19,11 +19,10 @@ class SegmentedSentences:
     """
     def __init__(self, model, file):
         self.model = model                                      # MorphModel
-        self.segmented_sents = self.segment_sentences(file)     # list(SegmentedSentences)
-
-    def segment_sentences(self, file):
+        # self.segmented_sents = self.segment_sentences(file)     # list(SegmentedSentences)
 
         with open(file, 'r') as f:
+
             segmented_sents = []
             for sent in f:
                 # words = sent.split()
@@ -31,22 +30,34 @@ class SegmentedSentences:
                 words = wordpunct_tokenize(sent)
                 segmented_sent = SegmentedSent(words, self.model)
                 segmented_sents.append(segmented_sent)
-                # print(sent)
-                # print(segmented_sent.words)
-                # print(segmented_sent.segmented_words)
-                # print(segmented_sent._segmented_sent_repr)
-                # print(segmented_sent._segments_with_space_symbol)
-                # print(segmented_sent._segments_no_space_symbol)
-            #print(segmented_sents)
-            return segmented_sents
+            self._segmented_sents = segmented_sents
+
+    # def segment_sentences(self, file):
+    #
+    #     with open(file, 'r') as f:
+    #         segmented_sents = []
+    #         for sent in f:
+    #             # words = sent.split()
+    #             sent = sent.lower()
+    #             words = wordpunct_tokenize(sent)
+    #             segmented_sent = SegmentedSent(words, self.model)
+    #             segmented_sents.append(segmented_sent)
+    #             # print(sent)
+    #             # print(segmented_sent.words)
+    #             # print(segmented_sent.segmented_words)
+    #             # print(segmented_sent._segmented_sent_repr)
+    #             # print(segmented_sent._segments_with_space_symbol)
+    #             # print(segmented_sent._segments_no_space_symbol)
+    #         #print(segmented_sents)
+    #         return segmented_sents
 
     # def segment_sentence(self, words):
     #     return SegmentedSent(words, self.model)
 
-    # @property
-    # def _segmented_sents(self):
-    #     return self._segmented_sents
-    #
+    @property
+    def segmented_sents(self):
+        return self._segmented_sents
+
     # @_segmented_sents.setter
     # def _segmented_sents(self, sents):
     #     self._segmented_sents = sents
@@ -95,8 +106,8 @@ class SegmentedSent:
         self._words = words     # return words
         self.model = model      # MorphModel
         self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
-        self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                       # 'the  boy s   chase d   the   girl s'
-        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '<separ>'. 'boy', 's' '<separ>'...] ◽
+        self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
+        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
         self._segments_no_space_symbol = []                                                  # ['the', 'boy', 's'...]
         for word in words:
             segments = self.model.segment_word(word)
