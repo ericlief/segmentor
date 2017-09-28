@@ -156,16 +156,13 @@ if __name__ == "__main__":
     #filenames = glob.glob('segments*')
 
     #test = ['segments-test.txt'] 'segments-ep.cs-en.en.txt',
-    filenames_cs = ['corp/DGT/cs-en.txt/DGT.cs-en.en', 'segments-ep.cs-en.cs.txt']
-    filenames_cs = ['segments-ep.cs-en.cs.txt']
-
-    filenames_en = ['segments-ep.cs-en.en.txt']
+    filenames_cs = ['segments-dgt.cs-en.cs.txt', 'segments-ep.cs-en.cs.txt']
+    filenames_en = ['segments-dgt.cs-en.en.txt', 'segments-ep.cs-en.en.txt']
 
     # dict_file_suffix = self.segments_file_in[8:]
     # abbrev_fn = self.segments_file_in[9:-3]
 
-    for filename_cs in filenames_cs:
-
+    for f_idx, filename_cs in enumerate(filenames_cs):
         # Train model
         model = MorphModel(filename_cs)
         model.process()
@@ -184,7 +181,10 @@ if __name__ == "__main__":
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
         print(segmented_sents_cs)
 
-    for filename_en in filenames_en:
+        # Get corresponding English (e) file and train
+        filename_en = filenames_en[f_idx]
+        print('processing ', filename_en, filename_cs)
+
         # Train model
         model = MorphModel(filename_en)
         model.process()
@@ -212,9 +212,11 @@ if __name__ == "__main__":
         # segs_spaces_en = segmented_sents_en.segments_space_symbol()
         # segs_no_space = segmented_sents.segments_no_space_symbol()
 
+        # Now align the sentences using the AlignedSentence class.
+        # There are different options for going about this, using the
+        # different possible segmentations with or without separator
         aligned_sentences_e2f = []
         aligned_sentences_f2e = []
-
         for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
             # aligned_sent = AlignedSentence(sent_e, sent_f)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
@@ -227,10 +229,13 @@ if __name__ == "__main__":
         # Train both forward and backward models
         iters = 20
         thresh = .30
-        file = 'aligned_sents-' + filename_cs[-15:-7] + '.txt'
-        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
-        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
+        file = 'alignments' + filename_cs[-16:-7] + '.txt'
 
+        # Forward (English) model
+        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
+
+        # Backward (Foreign) model
+        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
 
         # e2f_alignments = [sent.alignment for sent in e2f_sents]
         # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
@@ -238,6 +243,7 @@ if __name__ == "__main__":
 
 
         with open(file, 'w') as f:
+            print('saving ', file)
 
             # Symmetricize alignements by taking intersection
 
