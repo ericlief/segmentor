@@ -107,7 +107,7 @@ class SegmentedSent:
         self.model = model      # MorphModel
         self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
         self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
-        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '<separ>', 'boy', 's' '<separ>'...]
+        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
         self._segments_no_space_symbol = []                                                  # ['the', 'boy', 's'...]
         for word in words:
             segments = self.model.segment_word(word)

@@ -29,6 +29,15 @@ class AlignedSentence:
         # aligned_sentences.append(aligned_sent)
         return cls(words, mots)
 
+    @classmethod
+    def from_segmented_sent_to_segments_with_space_symbol(cls, segmented_sent_tar, segmented_sent_src):
+        words = segmented_sent_tar.segments_with_space_symbol  # source language words
+        mots = segmented_sent_src.segments_with_space_symbol  # target language words
+        # self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        # aligned_sent = AlignedSentence(sent_e, sent_f)
+        # aligned_sentences.append(aligned_sent)
+        return cls(words, mots)
+
     def inverse_alignment(self):
         """
         Utility method for alignment symmetrization.

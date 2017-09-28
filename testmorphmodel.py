@@ -156,7 +156,9 @@ if __name__ == "__main__":
     #filenames = glob.glob('segments*')
 
     #test = ['segments-test.txt'] 'segments-ep.cs-en.en.txt',
+    filenames_cs = ['corp/DGT/cs-en.txt/DGT.cs-en.en', 'segments-ep.cs-en.cs.txt']
     filenames_cs = ['segments-ep.cs-en.cs.txt']
+
     filenames_en = ['segments-ep.cs-en.en.txt']
 
     # dict_file_suffix = self.segments_file_in[8:]
@@ -215,16 +217,17 @@ if __name__ == "__main__":
 
         for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
             # aligned_sent = AlignedSentence(sent_e, sent_f)
-            aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tar, sent_src)
             aligned_sentences_e2f.append(aligned_sent)
-
-            aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tar)
             aligned_sentences_f2e.append(aligned_sent)
 
         # Train both forward and backward models
         iters = 20
         thresh = .30
-        file = 'aligned_sents-' + filename_cs[-15:-8]
+        file = 'aligned_sents-' + filename_cs[-15:-7] + '.txt'
         model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
         model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
 
@@ -240,8 +243,8 @@ if __name__ == "__main__":
 
             e2f_sents = model_e2f.aligned_sents
             f2e_sents = model_f2e.aligned_sents
-            # for k, e_sent in enumerate(e2f_sents):
-            for k, e_sent in enumerate(f2e_sents):
+            for k, e_sent in enumerate(e2f_sents):
+            # for k, e_sent in enumerate(f2e_sents):
 
                 # Convert alignements to string representation
                 e2f_str = ''
@@ -252,8 +255,8 @@ if __name__ == "__main__":
                     e2f_str += str(j) + '-' + str(i) + ' '
 
                 f2e_str = ''
-                # f_sent = f2e_sents[k]
-                f_sent = e2f_sents[k]
+                f_sent = f2e_sents[k]
+                # f_sent = e2f_sents[k]
 
                 f2e = f_sent.inverse_alignment()
                 # f2e = f_sent.alignment
@@ -268,17 +271,17 @@ if __name__ == "__main__":
                 for j, i in intersection:
                     int_str += str(j) + '-' + str(i) + ' '
 
-                # Symmetrization of bidirectional alignment (Cohn)
-                srclen = len(e_sent.mots)       # len of src sentence (f)
-                trglen = len(e_sent.words)      # len of tar sentence (e)
-                # trglen = len(e_sent.mots)  # len of src sentence (f)
-                # srclen = len(e_sent.words)  # len of tar sentence (e)
-
-                sym_align = grow_diag_final_and(srclen, trglen, e2f, f2e)
-                # sym_align = grow_diag_final_and(srclen, trglen, f2e, e2f)
-                sym_str = ''
-                for j, i in sym_align:
-                    sym_str += str(j) + '-' + str(i) + ' '
+                # # Symmetrization of bidirectional alignment (Cohn)
+                # srclen = len(e_sent.mots)       # len of src sentence (f)
+                # trglen = len(e_sent.words)      # len of tar sentence (e)
+                # # trglen = len(e_sent.mots)  # len of src sentence (f)
+                # # srclen = len(e_sent.words)  # len of tar sentence (e)
+                #
+                # sym_align = grow_diag_final_and(srclen, trglen, e2f, f2e)
+                # # sym_align = grow_diag_final_and(srclen, trglen, f2e, e2f)
+                # sym_str = ''
+                # for j, i in sym_align:
+                #     sym_str += str(j) + '-' + str(i) + ' '
 
                 # Write
                 f.write('\t'.join(e_sent.words) + '\n')
@@ -287,9 +290,8 @@ if __name__ == "__main__":
                 f.write(f2e_str + '\n')
                 f.write('intersection\n')
                 f.write(int_str + '\n')
-                f.write('symmetrization\n')
-                f.write(sym_str + '\n')
-
+                # f.write('symmetrization\n')
+                # f.write(sym_str + '\n')
 
 
                     # model.write_alignments(file)
