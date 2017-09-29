@@ -150,6 +150,24 @@ def grow_diag_final_and(srclen, trglen, e2f, f2e):
 
     return alignment
 
+def identify_morph(morph, morph_model):
+    """
+    Rudimentary (rough) way of identifying
+    what type of morph a segment is for a
+    given language, by checking
+    the dictionaries in the MorphModel
+    :param morph:
+    :param morph_model:
+    :return:
+    """
+    if morph in morph_model.stems:
+        return 's'
+    if morph in morph_model.prefixes:
+        return 'p'
+    if morph in morph_model.suffixes:
+        return 'e'
+    return '<UNK>'
+
 if __name__ == "__main__":
 
     # Get all segments files
@@ -248,30 +266,31 @@ if __name__ == "__main__":
         # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
         # alignments = [set(e2f).intersection(set(f2e)) for (e2f, f2e) in zip(e2f_alignments, f2e_alignments)]
 
-
         with open(file, 'w') as f:
             print('saving ', file)
 
             # Symmetrize alignements by taking intersection
+            e2f_sents = model_e2f.aligned_sents     # forward sentences
+            f2e_sents = model_f2e.aligned_sents     # backward sentences
 
-            e2f_sents = model_e2f.aligned_sents
-            f2e_sents = model_f2e.aligned_sents
-            for k, e_sent in enumerate(e2f_sents):
+            # Iterate through forward and backward pairs, write alignments
+            # and get intersection (symmetrize)
+            for k, forward_sent in enumerate(e2f_sents):
             # for k, e_sent in enumerate(f2e_sents):
 
                 # Convert alignments to string representation
                 e2f_str = ''
-                e2f = e_sent.alignment
+                e2f = forward_sent.alignment            # forward alignment
                 # e2f = e_sent.inverse_alignment() # inverse?
 
                 for j, i in e2f:
                     e2f_str += str(j) + '-' + str(i) + ' '
 
                 f2e_str = ''
-                f_sent = f2e_sents[k]
+                f_sent = f2e_sents[k]               # corresponding backward sentence
                 # f_sent = e2f_sents[k]
 
-                f2e = f_sent.inverse_alignment()
+                f2e = f_sent.inverse_alignment()    # backward alignment
                 # f2e = f_sent.alignment
                 for j, i in f2e:
                     f2e_str += str(j) + '-' + str(i) + ' '
@@ -296,19 +315,35 @@ if __name__ == "__main__":
                 # for j, i in sym_align:
                 #     sym_str += str(j) + '-' + str(i) + ' '
 
+                words = forward_sent.words      # target sentence
+                mots = forward_sent.mots        # source sentence
+
                 # Write
-                f.write('\t'.join(e_sent.words) + '\n')
-                f.write('\t'.join(e_sent.mots) + '\n')
+                f.write('\t'.join(words) + '\n')
+                f.write('\t'.join(mots) + '\n')
                 f.write(e2f_str + '\n')
                 f.write(f2e_str + '\n')
                 f.write('intersection\n')
                 f.write(int_str + '\n')
+
+                # Calculate alignment stats for intersection (symmetrized) alignments
+                signatures = defaultdict(int)
+                for j, i in intersection:
+                    word = words[j]     # target segment
+                    mot = mots[i]       # source segment
+                    sig = identify_morph(word, trg_mm) + '-' + identify_morph(mot, src_mm)      # e.g. 'j-i' -> 's-e'
+                
+
+
+
+                f.write('stats\n')
+                f.write(int_str + '\n')
                 # f.write('symmetrization\n')
                 # f.write(sym_str + '\n')
 
-        file = 'stats' + filename_cs[-16:-7] + '.txt'
-        with open(file, 'w') as f:
-
+        # file = 'stats' + filename_cs[-16:-7] + '.txt'
+        # with open(file, 'w') as f:
+        #
 
 
 
