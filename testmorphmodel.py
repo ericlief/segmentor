@@ -243,26 +243,32 @@ if __name__ == "__main__":
         aligned_sentences_e2f = []
         aligned_sentences_f2e = []
         for sent_tgt, sent_src in zip(segmented_sents_tgt.segmented_sents, segmented_sents_src.segmented_sents):
-            # aligned_sent = AlignedSentence(sent_e, sent_f)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tar, sent_src)
+
+            # Forward
+            # aligned_sent = AlignedSentence(sent_tgt, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_trg, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_trg, sent_src)
             aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_tgt, sent_src)
             aligned_sentences_e2f.append(aligned_sent)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tar)
+
+            # Backward
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_trg)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_trg)
             aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_tgt)
             aligned_sentences_f2e.append(aligned_sent)
 
         # Train both forward and backward models, get alignments
         iters = 20
         thresh = .30
-        file = 'alignments' + filename_src[-16:-7] + '.txt'
+        file = 'alignments_no_space' + filename_src[-16:-7] + '.txt'
 
         # Forward (English) model with alignments
-        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
+        # model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
+        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_' + file)
+
 
         # Backward (Foreign) model with alignments
-        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
+        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_' + file)
 
         # e2f_alignments = [sent.alignment for sent in e2f_sents]
         # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
