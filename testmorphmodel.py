@@ -163,19 +163,21 @@ if __name__ == "__main__":
     # abbrev_fn = self.segments_file_in[9:-3]
 
     for f_idx, filename_cs in enumerate(filenames_cs):
-        # Train model
-        model = MorphModel(filename_cs)
-        model.process()
-        model.reprocess()
-        model.shift_boundary()
-        model.write()
+
+        # Train source MorphModel
+        src_mm = MorphModel(filename_cs)
+        src_mm.process()
+        src_mm.reprocess()
+        src_mm.shift_boundary()
+        src_mm.write()
 
         # Process text for translation
         # segmented_sents = SegmentedSentences(model, 'cs-en.txt/Europarl' + filename[-13:-4])
         #segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_cs = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_cs[-13:-4])
         # segmented_sents_cs = SegmentedSentences(model, 'Europarl' + filename_cs[-13:-4])
-        segmented_sents_cs = SegmentedSentences(model, 'small_cz')
+        # segmented_sents_cs = SegmentedSentences(model, 'small_cz')
+        segmented_sents_cs = SegmentedSentences(src_mm, 'dgt_cs_small.txt')
         # segmented_sents_cs = SegmentedSentences(model, 'large_cz')
 
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
@@ -185,19 +187,21 @@ if __name__ == "__main__":
         filename_en = filenames_en[f_idx]
         print('processing ', filename_en, filename_cs)
 
-        # Train model
-        model = MorphModel(filename_en)
-        model.process()
-        model.reprocess()
-        model.shift_boundary()
-        model.write()
+        # Train target MorphModel
+        trg_mm = MorphModel(filename_en)
+        trg_mm.process()
+        trg_mm.reprocess()
+        trg_mm.shift_boundary()
+        trg_mm.write()
 
         # Process text for translation
         # segmented_sents = SegmentedSentences(model, 'cs-en.txt/Europarl' + filename[-13:-4])
         # segmented_sents = SegmentedSentences(model, 'test.txt')
         # segmented_sents_en = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_en[-13:-4])
         # segmented_sents_en = SegmentedSentences(model, 'Europarl' + filename_en[-13:-4])
-        segmented_sents_en = SegmentedSentences(model, 'small_en')
+        # segmented_sents_en = SegmentedSentences(model, 'small_en')
+        segmented_sents_en = SegmentedSentences(trg_mm, 'dgt_en_small.txt')
+
         # segmented_sents_en = SegmentedSentences(model, 'large_en')
         # segmented_sents_en = SegmentedSentences(model, 'test_en')
 
@@ -214,27 +218,30 @@ if __name__ == "__main__":
 
         # Now align the sentences using the AlignedSentence class.
         # There are different options for going about this, using the
-        # different possible segmentations with or without separator
+        # different possible segmentations with or without separator,
+        # encapulated in the SegmentedSentences class
         aligned_sentences_e2f = []
         aligned_sentences_f2e = []
         for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
             # aligned_sent = AlignedSentence(sent_e, sent_f)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
-            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tar, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tar, sent_src)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_tar, sent_src)
             aligned_sentences_e2f.append(aligned_sent)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
-            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tar)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tar)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_tar)
             aligned_sentences_f2e.append(aligned_sent)
 
-        # Train both forward and backward models
+        # Train both forward and backward models, get alignments
         iters = 20
         thresh = .30
         file = 'alignments' + filename_cs[-16:-7] + '.txt'
 
-        # Forward (English) model
+        # Forward (English) model with alignments
         model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
 
-        # Backward (Foreign) model
+        # Backward (Foreign) model with alignments
         model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='output_alignments_small_f2e.txt')
 
         # e2f_alignments = [sent.alignment for sent in e2f_sents]
@@ -245,14 +252,14 @@ if __name__ == "__main__":
         with open(file, 'w') as f:
             print('saving ', file)
 
-            # Symmetricize alignements by taking intersection
+            # Symmetrize alignements by taking intersection
 
             e2f_sents = model_e2f.aligned_sents
             f2e_sents = model_f2e.aligned_sents
             for k, e_sent in enumerate(e2f_sents):
             # for k, e_sent in enumerate(f2e_sents):
 
-                # Convert alignements to string representation
+                # Convert alignments to string representation
                 e2f_str = ''
                 e2f = e_sent.alignment
                 # e2f = e_sent.inverse_alignment() # inverse?
@@ -299,8 +306,23 @@ if __name__ == "__main__":
                 # f.write('symmetrization\n')
                 # f.write(sym_str + '\n')
 
+        file = 'stats' + filename_cs[-16:-7] + '.txt'
+        with open(file, 'w') as f:
 
-                    # model.write_alignments(file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+            # model.write_alignments(file)
 
         # for sent in segs_spaces_cs:
         #

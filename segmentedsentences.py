@@ -17,10 +17,12 @@ class SegmentedSentences:
     of a sentence tokenized text, which can be used in
     MT.
     """
-    def __init__(self, model, file):
-        self.model = model                                      # MorphModel
+    def __init__(self, morph_model, file):
+        self.model = morph_model                                      # MorphModel
         # self.segmented_sents = self.segment_sentences(file)     # list(SegmentedSentences)
 
+        # Tokenize text and then segment sentences, using
+        # trained MorphModel
         with open(file, 'r') as f:
 
             segmented_sents = []

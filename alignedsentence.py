@@ -11,14 +11,16 @@ from segmentedsentences import *
 
 class AlignedSentence:
     """
-    A simple AlignedSentence object which encapsulates
-    two sentences and the alginment between them
+    An AlignedSentence object which encapsulates
+    two sentences and the alignment between them. In addition
+    providing useful tools to compare alignments and calculate
+    statistics.
     """
 
     def __init__(self, words, mots, alignment=None):
         self._words = words                 # tar language words
         self._mots = mots                   # src language words
-        self.alignment = alignment         # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        self.alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
 
     @classmethod
     def from_segmented_sent_to_words(cls, segmented_sent_tar, segmented_sent_src):
@@ -33,6 +35,15 @@ class AlignedSentence:
     def from_segmented_sent_to_segments_with_space_symbol(cls, segmented_sent_tar, segmented_sent_src):
         words = segmented_sent_tar.segments_with_space_symbol  # source language words
         mots = segmented_sent_src.segments_with_space_symbol  # target language words
+        # self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
+        # aligned_sent = AlignedSentence(sent_e, sent_f)
+        # aligned_sentences.append(aligned_sent)
+        return cls(words, mots)
+
+    @classmethod
+    def from_segmented_sent_to_segments_no_space_symbol(cls, segmented_sent_tar, segmented_sent_src):
+        words = segmented_sent_tar.segments_no_space_symbol  # source language words
+        mots = segmented_sent_src.segments_no_space_symbol  # target language words
         # self._alignment = alignment          # list of tuples of tar to src mapping [(0,1), (1,1), ...]
         # aligned_sent = AlignedSentence(sent_e, sent_f)
         # aligned_sentences.append(aligned_sent)
