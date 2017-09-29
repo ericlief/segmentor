@@ -174,16 +174,16 @@ if __name__ == "__main__":
     #filenames = glob.glob('segments*')
 
     #test = ['segments-test.txt'] 'segments-ep.cs-en.en.txt',
-    filenames_cs = ['segments-dgt.cs-en.cs.txt', 'segments-ep.cs-en.cs.txt']
-    filenames_en = ['segments-dgt.cs-en.en.txt', 'segments-ep.cs-en.en.txt']
+    filenames_src = ['segments-dgt.cs-en.cs.txt', 'segments-ep.cs-en.cs.txt']
+    filenames_tgt = ['segments-dgt.cs-en.en.txt', 'segments-ep.cs-en.en.txt']
 
     # dict_file_suffix = self.segments_file_in[8:]
     # abbrev_fn = self.segments_file_in[9:-3]
 
-    for f_idx, filename_cs in enumerate(filenames_cs):
+    for f_idx, filename_src in enumerate(filenames_src):
 
         # Train source MorphModel
-        src_mm = MorphModel(filename_cs)
+        src_mm = MorphModel(filename_src)
         src_mm.process()
         src_mm.reprocess()
         src_mm.shift_boundary()
@@ -195,18 +195,19 @@ if __name__ == "__main__":
         # segmented_sents_cs = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_cs[-13:-4])
         # segmented_sents_cs = SegmentedSentences(model, 'Europarl' + filename_cs[-13:-4])
         # segmented_sents_cs = SegmentedSentences(model, 'small_cz')
-        segmented_sents_cs = SegmentedSentences(src_mm, 'dgt_cs_small.txt')
+        # segmented_sents_cs = SegmentedSentences(src_mm, 'dgt_cs_small.txt')
         # segmented_sents_cs = SegmentedSentences(model, 'large_cz')
-
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
+        segmented_sents_cs = SegmentedSentences(src_mm, filename_src[9:])
+
         print(segmented_sents_cs)
 
         # Get corresponding English (e) file and train
-        filename_en = filenames_en[f_idx]
-        print('processing ', filename_en, filename_cs)
+        filename_tgt = filenames_tgt[f_idx]
+        print('processing ', filename_tgt, filename_src)
 
         # Train target MorphModel
-        trg_mm = MorphModel(filename_en)
+        trg_mm = MorphModel(filename_tgt)
         trg_mm.process()
         trg_mm.reprocess()
         trg_mm.shift_boundary()
@@ -218,10 +219,11 @@ if __name__ == "__main__":
         # segmented_sents_en = SegmentedSentences(model, '/media/liefe/data/corp/EP/Europarl' + filename_en[-13:-4])
         # segmented_sents_en = SegmentedSentences(model, 'Europarl' + filename_en[-13:-4])
         # segmented_sents_en = SegmentedSentences(model, 'small_en')
-        segmented_sents_en = SegmentedSentences(trg_mm, 'dgt_en_small.txt')
-
+        # segmented_sents_en = SegmentedSentences(trg_mm, 'dgt_en_small.txt')
         # segmented_sents_en = SegmentedSentences(model, 'large_en')
         # segmented_sents_en = SegmentedSentences(model, 'test_en')
+        segmented_sents_en = SegmentedSentences(trg_mm, filename_tgt[9:])
+
 
         #f = 'Europarl.cs-en.en'
 
@@ -254,7 +256,7 @@ if __name__ == "__main__":
         # Train both forward and backward models, get alignments
         iters = 20
         thresh = .30
-        file = 'alignments' + filename_cs[-16:-7] + '.txt'
+        file = 'alignments' + filename_src[-16:-7] + '.txt'
 
         # Forward (English) model with alignments
         model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
@@ -268,6 +270,7 @@ if __name__ == "__main__":
 
         with open(file, 'w') as f:
             print('saving ', file)
+            signatures = defaultdict(int)   # for calculating stats
 
             # Symmetrize alignements by taking intersection
             e2f_sents = model_e2f.aligned_sents     # forward sentences
@@ -327,17 +330,19 @@ if __name__ == "__main__":
                 f.write(int_str + '\n')
 
                 # Calculate alignment stats for intersection (symmetrized) alignments
-                signatures = defaultdict(int)
+                # signatures = defaultdict(int)
                 for j, i in intersection:
                     word = words[j]     # target segment
                     mot = mots[i]       # source segment
                     sig = identify_morph(word, trg_mm) + '-' + identify_morph(mot, src_mm)      # e.g. 'j-i' -> 's-e'
-                
+                    signatures[sig] += 1
+
 
 
 
                 f.write('stats\n')
-                f.write(int_str + '\n')
+                f.write(str(signatures) + '\n')
+
                 # f.write('symmetrization\n')
                 # f.write(sym_str + '\n')
 
