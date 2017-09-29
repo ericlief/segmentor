@@ -198,9 +198,9 @@ if __name__ == "__main__":
         # segmented_sents_cs = SegmentedSentences(src_mm, 'dgt_cs_small.txt')
         # segmented_sents_cs = SegmentedSentences(model, 'large_cz')
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
-        segmented_sents_cs = SegmentedSentences(src_mm, filename_src[9:])
+        segmented_sents_src = SegmentedSentences(src_mm, filename_src[9:])
 
-        print(segmented_sents_cs)
+        print(segmented_sents_src)
 
         # Get corresponding English (e) file and train
         filename_tgt = filenames_tgt[f_idx]
@@ -222,7 +222,7 @@ if __name__ == "__main__":
         # segmented_sents_en = SegmentedSentences(trg_mm, 'dgt_en_small.txt')
         # segmented_sents_en = SegmentedSentences(model, 'large_en')
         # segmented_sents_en = SegmentedSentences(model, 'test_en')
-        segmented_sents_en = SegmentedSentences(trg_mm, filename_tgt[9:])
+        segmented_sents_tgt = SegmentedSentences(trg_mm, filename_tgt[9:])
 
 
         #f = 'Europarl.cs-en.en'
@@ -242,15 +242,15 @@ if __name__ == "__main__":
         # encapulated in the SegmentedSentences class
         aligned_sentences_e2f = []
         aligned_sentences_f2e = []
-        for sent_tar, sent_src in zip(segmented_sents_en.segmented_sents, segmented_sents_cs.segmented_sents):
+        for sent_tgt, sent_src in zip(segmented_sents_tgt.segmented_sents, segmented_sents_src.segmented_sents):
             # aligned_sent = AlignedSentence(sent_e, sent_f)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tar, sent_src)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tar, sent_src)
-            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_tar, sent_src)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_tgt, sent_src)
             aligned_sentences_e2f.append(aligned_sent)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_tar)
             # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tar)
-            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_tar)
+            aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_tgt)
             aligned_sentences_f2e.append(aligned_sent)
 
         # Train both forward and backward models, get alignments
