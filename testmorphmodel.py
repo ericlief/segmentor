@@ -174,9 +174,13 @@ if __name__ == "__main__":
     #filenames = glob.glob('segments*')
 
     #test = ['segments-test.txt'] 'segments-ep.cs-en.en.txt',
-    filenames_src = ['segments-dgt.cs-en.cs.txt', 'segments-ep.cs-en.cs.txt']
-    filenames_tgt = ['segments-dgt.cs-en.en.txt', 'segments-ep.cs-en.en.txt']
+#    filenames_src = ['segments-ep.cs-en.cs.txt']
+#    filenames_tgt = ['segments-ep.cs-en.en.txt']
 
+    filenames_src = ['segments-dgt.cs-en.cs.txt']
+    filenames_tgt = ['segments-dgt.cs-en.en.txt']
+
+           
     # dict_file_suffix = self.segments_file_in[8:]
     # abbrev_fn = self.segments_file_in[9:-3]
 
@@ -198,8 +202,9 @@ if __name__ == "__main__":
         # segmented_sents_cs = SegmentedSentences(src_mm, 'dgt_cs_small.txt')
         # segmented_sents_cs = SegmentedSentences(model, 'large_cz')
         # segmented_sents_cs = SegmentedSentences(model, 'test_cz')
-        segmented_sents_src = SegmentedSentences(src_mm, filename_src[9:])
-
+        #segmented_sents_src = SegmentedSentences(src_mm, filename_src[9:])
+        segmented_sents_src = SegmentedSentences(src_mm, filename_src[9:]+'.med')
+        
         print(segmented_sents_src)
 
         # Get corresponding English (e) file and train
@@ -222,8 +227,9 @@ if __name__ == "__main__":
         # segmented_sents_en = SegmentedSentences(trg_mm, 'dgt_en_small.txt')
         # segmented_sents_en = SegmentedSentences(model, 'large_en')
         # segmented_sents_en = SegmentedSentences(model, 'test_en')
-        segmented_sents_tgt = SegmentedSentences(trg_mm, filename_tgt[9:])
-
+        # segmented_sents_tgt = SegmentedSentences(trg_mm, filename_tgt[9:])
+        segmented_sents_tgt = SegmentedSentences(trg_mm, filename_tgt[9:]+'.med')
+        
 
         #f = 'Europarl.cs-en.en'
 
@@ -246,29 +252,29 @@ if __name__ == "__main__":
 
             # Forward
             # aligned_sent = AlignedSentence(sent_tgt, sent_src)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_trg, sent_src)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_trg, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_tgt, sent_src)
+            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_tgt, sent_src)
             aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_tgt, sent_src)
             aligned_sentences_e2f.append(aligned_sent)
 
             # Backward
             # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_trg)
-            # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_trg)
+            #aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_tgt)
             aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_tgt)
             aligned_sentences_f2e.append(aligned_sent)
 
         # Train both forward and backward models, get alignments
         iters = 20
         thresh = .30
-        file = 'alignments_no_space' + filename_src[-16:-7] + '.txt'
+        file = 'alignments_no_space' + filename_src[-16:-7] + '.redo'
 
         # Forward (English) model with alignments
         # model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
-        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_' + file)
+        model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_no_space' + file)
 
 
         # Backward (Foreign) model with alignments
-        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_' + file)
+        model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_no_space' + file)
 
         # e2f_alignments = [sent.alignment for sent in e2f_sents]
         # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
