@@ -7,24 +7,26 @@ read corpus
 echo "Enter paralell corpus languages separated by a dash"
 read paral
 
-unzip "/var/tmp/${corpus}-${paral}.txt.zip" -d /var/tmp
+#unzip "/var/tmp/${corpus}-${paral}.txt.zip" -d /var/tmp
 
 if [[ $corpus == "ep" ]];
 then
-    DATA_SOURCE="/var/tmp/Europarl.${paral}.${lang}"
+    DATA_SOURCE="/var/tmp/Europarl.${paral}.${lang}.gz"
 	#DATA_SOURCE="Europarl.raw.${lang}.gz"
     URL="http://opus.lingfil.uu.se/download.php?f=Europarl/mono/Europarl.raw.${lang}.gz"
 elif [[ $corpus == "dgt" ]]; then
 	#DATA_SOURCE="DGT.raw.${lang}.gz"
     DATA_SOURCE="/var/tmp/DGT.${paral}.${lang}"
-	URL="http://opus.lingfil.uu.se/download.php?f=DGT/mono/DGT.raw.{lang}.gz"
+    URL="http://opus.lingfil.uu.se/download.php?f=DGT/mono/DGT.raw.${lang}.gz"
 elif [[ $corpus == "os" ]]; then
     #DATA_SOURCE="/tmp/OpenSubtitles2016.raw.${lang}.gz"
-	DATA_SOURCE="/var/tmp/OpenSubtitles2016.${paral}.${lang}"
-    URL="http://opus.lingfil.uu.se/download.php?f=OpenSubtitles2016/mono/OpenSubtitles2016.raw.{lang}.gz"
+    DATA_SOURCE="/var/tmp/OpenSubtitles2016.${paral}.${lang}.gz"
+    URL="http://opus.lingfil.uu.se/download.php?f=OpenSubtitles2016/mono/OpenSubtitles2016.raw.${lang}.gz"
 else
     echo "Corpus not found!"
 fi
+
+
 
 
 MORFESSOR_MODEL="morfessor-model-${corpus}.${lang}.bin"
@@ -37,7 +39,8 @@ SEGMENT_OUTPUT="segments-${corpus}.${paral}.${lang}.txt"
 RECONSTRUCTED_SENTS="output-segmented-${corpus}.${paral}.${lang}.txt"
 
 # Download DATA
-#wget -O $DATA_SOURCE $URL
+wget -O $DATA_SOURCE $URL
+#unzip "/var/tmp/${corpus}-${paral}.txt.zip" -d /var/tmp
 #wget -O- $URL > dev/null 2>&1 | python3 tokenizer.py > $TRAIN_CORPUS
 
 # tokenizer.py:
@@ -47,17 +50,17 @@ chmod u+x tokenizer.py
 chmod u+x reconstruct-sentences.py
 
 # training-data-ep-%.gz: $(DATA_SOURCE)
-#if [[ $DATA_SOURCE == *"tar.gz"* ]];
-#then
-#    tar -xOzf $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
+if [[ $DATA_SOURCE == *"tar.gz"* ]];
+then
+    tar -xOzf $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
     #wget -O- $URL > dev/null 2>&1 | python3 tokenizer.py > $TRAIN_CORPUS#
-#else
-#    gunzip -ckv $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
+else
+    gunzip -ckv $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
   # wget -O- $URL > dev/null 2>&1 | python3 tokenizer.py > $TRAIN_CORPUS
-#fi
+fi
 #wget -O- $URL > dev/null 2>&1 | python3 tokenizer.py > $TRAIN_CORPUS
 
-cat $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
+#cat $DATA_SOURCE | python3 tokenizer.py > $TRAIN_CORPUS
 
 #gzip -f $TRAIN_CORPUS
 #TRAIN_CORPUS+=".gz"

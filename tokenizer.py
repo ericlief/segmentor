@@ -1,13 +1,13 @@
 from nltk.tokenize.punkt import PunktSentenceTokenizer
-from nltk.tokenize.moses import MosesTokenizer, MosesDetokenizer
-from nltk.tokenize.treebank import TreebankWordTokenizer
+#from nltk.tokenize.moses import MosesTokenizer, MosesDetokenizer
+#from nltk.tokenize.treebank import TreebankWordTokenizer
 #from nltk.tokenize.stanford import StanfordTokenizer
 from nltk.tokenize import wordpunct_tokenize
 
 #import io
 import sys
 
-t = TreebankWordTokenizer()
+#t = TreebankWordTokenizer()
 #t = PunktSentenceTokenizer()
 #t = MosesTokenizer()
 #t = StanfordTokenizer()
