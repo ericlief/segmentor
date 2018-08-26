@@ -13,15 +13,15 @@ Created on 30.05.17
 """
 
 from glob import glob
-from segmentedsentences import *
+from morphmodel import *
 import pickle
 
 if __name__ == "__main__":
 
 
+    #filenames = ['segments-ep.cs-en.cs.txt']
     filenames = ['segments-ep.cs-en.cs.txt', 'segments-dgt.cs-en.cs.txt', 'segments-os.cs-en.cs.txt',
                  'segments-ep.cs-en.en.txt', 'segments-dgt.cs-en.en.txt', 'segments-os.cs-en.en.txt']
-
 
     for f_idx, filename in enumerate(filenames):
 
@@ -33,7 +33,11 @@ if __name__ == "__main__":
         model.shift_boundary()
         model.write()
         
-        with open('model'+filename[8], 'w') as f:
+        with open('model'+filename[8:-3]+'bin', 'wb') as f:
             pickle.dump(model, f)
             
  
+        with open('model'+filename[8:-3]+'bin', 'rb') as f:
+            m = pickle.load(f)
+            print('UNKNOWN words for ', filename)
+            print(m.unknown)
