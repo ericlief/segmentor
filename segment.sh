@@ -7,15 +7,14 @@ read corpus
 
 if [[ $corpus == "ep" ]];
 then
-    DATA_SOURCE="Europarl.raw.${lang}.gz"
-    
+    DATA_SOURCE="Europarl.raw.${lang}.gz"    
     URL="http://opus.lingfil.uu.se/download.php?f=Europarl/mono/Europarl.raw.${lang}.gz"
 elif [[ $corpus == "dgt" ]]; then
 	DATA_SOURCE="DGT.raw.${lang}.gz"
-	URL="http://opus.lingfil.uu.se/download.php?f=DGT/mono/DGT.raw.{lang}.gz"
+	URL="http://opus.lingfil.uu.se/download.php?f=DGT/mono/DGT.raw.${lang}.gz"
 elif [[ $corpus == "os" ]]; then
     DATA_SOURCE="/tmp/OpenSubtitles2016.raw.${lang}.gz"
-    URL="http://opus.lingfil.uu.se/download.php?f=OpenSubtitles2016/mono/OpenSubtitles2016.raw.{lang}.gz"
+    URL="http://opus.lingfil.uu.se/download.php?f=OpenSubtitles2016/mono/OpenSubtitles2016.raw.${lang}.gz"
 else
     echo "Corpus not found!"
 fi
@@ -31,7 +30,7 @@ SEGMENT_OUTPUT="segments-${corpus}.${lang}.txt"
 RECONSTRUCTED_SENTS="output-segmented-${corpus}.${lang}.txt"
 
 # Download DATA
-#wget -O $DATA_SOURCE $URL
+wget -O $DATA_SOURCE $URL
 #wget -O- $URL > dev/null 2>&1 | python3 tokenizer.py > $TRAIN_CORPUS
 
 # tokenizer.py:
