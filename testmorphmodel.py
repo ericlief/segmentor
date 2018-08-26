@@ -177,8 +177,8 @@ if __name__ == "__main__":
 #    filenames_src = ['segments-ep.cs-en.cs.txt']
 #    filenames_tgt = ['segments-ep.cs-en.en.txt']
 
-    filenames_src = ['segments-dgt.cs-en.cs.txt']
-    filenames_tgt = ['segments-dgt.cs-en.en.txt']
+    filenames_src = ['segments-dgt.es-pt.es.txt']
+    filenames_tgt = ['segments-dgt.es-pt.pt.txt']
 
            
     # dict_file_suffix = self.segments_file_in[8:]
