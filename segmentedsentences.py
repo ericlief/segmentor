@@ -8,7 +8,7 @@ Created on 30.05.17
 """
 
 from nltk.tokenize import wordpunct_tokenize
-
+from morphmodel import *
 
 class SegmentedSentences:
     """
@@ -107,6 +107,9 @@ class SegmentedSent:
     def __init__(self, words, model):
         self._words = words     # return words
         self.model = model      # MorphModel
+
+        print(self.model.__class__.__name__)
+        
         self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
         self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
         self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]

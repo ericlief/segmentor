@@ -19,9 +19,9 @@ import pickle
 if __name__ == "__main__":
 
 
-    #filenames = ['segments-ep.cs-en.cs.txt']
-    filenames = ['segments-ep.cs-en.cs.txt', 'segments-dgt.cs-en.cs.txt', 'segments-os.cs-en.cs.txt',
-                 'segments-ep.cs-en.en.txt', 'segments-dgt.cs-en.en.txt', 'segments-os.cs-en.en.txt']
+    filenames = ['segments-ep.cs-sk.cs.txt']
+    #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
+    #             'segments-ep.cs-sk.sk.txt', 'segments-dgt.cs-sk.sk.txt', 'segments-os.cs-sk.sk.txt']
 
     for f_idx, filename in enumerate(filenames):
 
@@ -41,3 +41,5 @@ if __name__ == "__main__":
             m = pickle.load(f)
             print('UNKNOWN words for ', filename)
             print(m.unknown)
+            print(m.segment_word('pochopit'))
+            print(m.segment_word('ženy'))

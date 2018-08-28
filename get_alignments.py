@@ -174,15 +174,15 @@ if __name__ == "__main__":
     
  
     if len(sys.argv) == 3:
-        filename_src = sys.argsv[1]
-        filename_targ = sys.argsv[2]
+        filename_src = sys.argv[1]
+        filename_targ = sys.argv[2]
         print('processing ', filename_src, filename_targ)
         
-        with open('model-' + filename_src + '.bin', 'rb'):      
-            model_src = picke.load
+        with open('model-' + filename_src[0:-3] + '.bin', 'rb'):      
+            model_src = pickle.load
             
-        with open('model-' + filename_targ + '.bin', 'rb'):     
-            model_targ = picke.load            
+        with open('model-' + filename_targ[0:-3] + '.bin', 'rb'):     
+            model_targ = pickle.load            
             
     else:
         sys.exit
