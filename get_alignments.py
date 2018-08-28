@@ -178,10 +178,10 @@ if __name__ == "__main__":
         filename_targ = sys.argsv[2]
         print('processing ', filename_src, filename_targ)
         
-        with open('model_src-' + filename_src + '.bin', 'rb'):      
+        with open('model-' + filename_src + '.bin', 'rb'):      
             model_src = picke.load
             
-        with open('model_targ-' + filename_targ + '.bin', 'rb'):     
+        with open('model-' + filename_targ + '.bin', 'rb'):     
             model_targ = picke.load            
             
     else:
@@ -212,7 +212,8 @@ if __name__ == "__main__":
     # Train both forward and backward models, get alignments
     iters = 20
     thresh = .30
-    file = 'alignments_no_space' + filename_src[-16:-7] + '.redo'
+    #file = 'alignments_no_space' + filename_src[-16:-7] + '.redo'
+    file = 'alignments_no_space' + filename_src
 
     # Forward (English) model with alignments
     # model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
