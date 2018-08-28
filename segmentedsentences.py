@@ -138,3 +138,56 @@ class SegmentedSent:
     def segments_no_space_symbol(self):
         return self._segments_no_space_symbol
 
+    
+    
+    
+    
+    
+if __name__ == "__main__":
+    import sys
+    import pickle
+    
+ 
+    #if len(sys.argv) == 3:
+        #filename_src = sys.argv[1]
+        #filename_targ = sys.argv[2]
+        #print('processing ', filename_src, filename_targ)
+        
+        #with open('model-' + filename_src[0:-3] + '.bin', 'rb'):      
+            #model_src = pickle.load
+            
+        #with open('model-' + filename_targ[0:-3] + '.bin', 'rb'):     
+            #model_targ = pickle.load            
+            
+    #else:
+        #sys.exit
+      
+    filenames = ['segments-ep.cs-en.cs.txt'] 
+    #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
+    #             'segments-ep.cs-sk.sk.txt', 'segments-dgt.cs-sk.sk.txt', 'segments-os.cs-sk.sk.txt']
+
+    for f_idx, filename in enumerate(filenames):
+
+        # Train source MorphModel
+        print('Building model for: ', filename)
+        model = MorphModel(filename)
+        model.process()
+        model.reprocess()
+        model.shift_boundary()
+        model.write()
+        
+        with open('model'+filename[8:-3]+'bin', 'wb') as f:
+            pickle.dump(model, f)
+            
+ 
+        with open('model'+filename[8:-3]+'bin', 'rb') as f:
+            m = pickle.load(f)
+            print('UNKNOWN words for ', filename)
+            print(m.unknown)
+            print(m.segment_word('pochopit'))
+            print(m.segment_word('ženy'))    
+            
+            file = filename[9:-4] + '.sm'       
+            segmented_sents = SegmentedSentences(m, file)
+            for seg_sent in segmented_sents.segmented_sents:
+                print(seg_sent.segmented_words)
