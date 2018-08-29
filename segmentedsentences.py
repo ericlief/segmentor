@@ -72,17 +72,17 @@ class SegmentedSentences:
             # print(sent, sent.words)
         return results
 
-    def segmented_words(self):
-        results = []
-        for sent in self.segmented_sents:
-            results.append(sent.segmented_words)
-        return results
+    #def segmented_words(self):
+        #results = []
+        #for sent in self.segmented_sents:
+            #results.append(sent.segmented_words)
+        #return results
 
-    def segments_space_symbol(self):
-        results = []
-        for sent in self.segmented_sents:
-            results.append(sent.segments_with_space_symbol)
-        return results
+    #def segments_space_symbol(self):
+        #results = []
+        #for sent in self.segmented_sents:
+            #results.append(sent.segments_with_space_symbol)
+        #return results
 
     def segments_no_space_symbol(self):
         results = []
@@ -90,11 +90,11 @@ class SegmentedSentences:
             results.append(sent.segments_no_space_symbol)
         return results
 
-    def segmented_sent_repr(self):
-        results = []
-        for sent in self.segmented_sents:
-            results.append(sent.segmented_sent_repr)
-        return results
+    #def segmented_sent_repr(self):
+        #results = []
+        #for sent in self.segmented_sents:
+            #results.append(sent.segmented_sent_repr)
+        #return results
 
 
 class SegmentedSent:
@@ -110,9 +110,9 @@ class SegmentedSent:
 
         # print(self.model.__class__.__name__)
         
-        self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
-        self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
-        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
+        #self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
+        #self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
+        #self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
         self._segments_no_space_symbol = []                                                  # ['the', 'boy', 's'...]
         for word in words:
             segments = self.model.segment_word(word)
@@ -122,17 +122,17 @@ class SegmentedSent:
     def words(self):
         return self._words
 
-    @property
-    def segmented_words(self):
-        return self._segmented_words
+    #@property
+    #def segmented_words(self):
+        #return self._segmented_words
 
-    @property
-    def segmented_sent_repr(self):
-        return self._segmented_sent_repr
+    #@property
+    #def segmented_sent_repr(self):
+        #return self._segmented_sent_repr
 
-    @property
-    def segments_with_space_symbol(self):
-        return self._segments_with_space_symbol
+    #@property
+    #def segments_with_space_symbol(self):
+        #return self._segments_with_space_symbol
 
     @property
     def segments_no_space_symbol(self):
@@ -163,8 +163,8 @@ if __name__ == "__main__":
     #else:
         #sys.exit
       
-    #filenames = ['segments-ep.cs-en.cs.txt']
-    filenames = ['segments-ep.cs-sk.sk.txt'] 
+    filenames = ['segments-ep.cs-en.cs.txt']
+    #filenames = ['segments-ep.cs-sk.sk.txt'] 
     #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
     #             'segments-ep.cs-sk.sk.txt', 'segments-dgt.cs-sk.sk.txt', 'segments-os.cs-sk.sk.txt']
 
@@ -192,4 +192,5 @@ if __name__ == "__main__":
             file = filename[9:-4] + '.sm'       
             segmented_sents = SegmentedSentences(m, file)
             for seg_sent in segmented_sents.segmented_sents:
-                print(seg_sent.segmented_words)
+                #print(seg_sent.segmented_words)
+                print(seg_sent.segments_no_space_symbol)
