@@ -178,11 +178,13 @@ if __name__ == "__main__":
         filename_targ = sys.argv[2]
         print('processing ', filename_src, filename_targ)
         
-        with open('model-' + filename_src[0:-3] + '.bin', 'rb'):      
-            model_src = pickle.load
+        with open('model-' + filename_src[0:-3] + '.bin', 'rb') as f:      
+            model_src = pickle.load(f)
+            print('loaded model src', model_src.__class__.__name__)
             
-        with open('model-' + filename_targ[0:-3] + '.bin', 'rb'):     
-            model_targ = pickle.load            
+        with open('model-' + filename_targ[0:-3] + '.bin', 'rb') as f:     
+            model_targ = pickle.load(f)
+            print('loaded model targ', model_targ.__class__.__name__) 
             
     else:
         sys.exit
@@ -213,15 +215,15 @@ if __name__ == "__main__":
     iters = 20
     thresh = .30
     #file = 'alignments_no_space' + filename_src[-16:-7] + '.redo'
-    file = 'alignments_no_space' + filename_src
+    file = 'alignments_no_space_' + filename_src
 
     # Forward (English) model with alignments
     # model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
-    model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_no_space' + file)
+    model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_no_space_' + file)
 
 
     # Backward (Foreign) model with alignments
-    model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_no_space' + file)
+    model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_no_space_' + file)
 
     # e2f_alignments = [sent.alignment for sent in e2f_sents]
     # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]

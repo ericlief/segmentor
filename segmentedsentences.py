@@ -108,7 +108,7 @@ class SegmentedSent:
         self._words = words     # return words
         self.model = model      # MorphModel
 
-        print(self.model.__class__.__name__)
+        # print(self.model.__class__.__name__)
         
         self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
         self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
@@ -146,7 +146,8 @@ class SegmentedSent:
 if __name__ == "__main__":
     import sys
     import pickle
-    
+
+    # Unit tests
  
     #if len(sys.argv) == 3:
         #filename_src = sys.argv[1]
@@ -162,7 +163,8 @@ if __name__ == "__main__":
     #else:
         #sys.exit
       
-    filenames = ['segments-ep.cs-en.cs.txt'] 
+    #filenames = ['segments-ep.cs-en.cs.txt']
+    filenames = ['segments-ep.cs-sk.sk.txt'] 
     #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
     #             'segments-ep.cs-sk.sk.txt', 'segments-dgt.cs-sk.sk.txt', 'segments-os.cs-sk.sk.txt']
 

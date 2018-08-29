@@ -19,9 +19,9 @@ import pickle
 if __name__ == "__main__":
 
 
-    filenames = ['segments-ep.cs-sk.cs.txt']
-    #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
-    #             'segments-ep.cs-sk.sk.txt', 'segments-dgt.cs-sk.sk.txt', 'segments-os.cs-sk.sk.txt']
+    #filenames = ['segments-ep.es-sk.cs.txt']
+    #filenames = ['segments-ep.es-pt.es.txt', 'segments-ep.es-pt.pt.txt']
+    filenames = ['segments-ep.es-pt.es.txt', 'segments-ep.es-pt.pt.txt']
 
     for f_idx, filename in enumerate(filenames):
 
