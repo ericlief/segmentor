@@ -9,6 +9,7 @@ The training files can be batch processed
 by their Morfessor 'segments-' prefixed filenames.
 
 Created on 30.05.17
+Mofified on 30.08.18
 @author: Eric Lief
 """
 
@@ -18,7 +19,7 @@ import pickle
 
 if __name__ == "__main__":
 
-
+    # Unit tests
     #filenames = ['segments-ep.es-sk.cs.txt']
     #filenames = ['segments-ep.es-pt.es.txt', 'segments-ep.es-pt.pt.txt']
     filenames = ['segments-ep.es-pt.es.txt', 'segments-ep.es-pt.pt.txt']

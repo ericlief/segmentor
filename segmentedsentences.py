@@ -4,6 +4,7 @@
 """
 Project: segmentor
 Created on 30.05.17
+Modified on 30.08.18
 @author: Eric Lief
 """
 
@@ -16,11 +17,21 @@ class SegmentedSentences:
     several different internal (segmental) representation of all sentences
     of a sentence tokenized text, which can be used in
     MT.
+    
+    These four possible representations are:
+    (1) Segmented words
+	['the', 'boy s', 'chase d', 'the', 'girl s']
+    (2) Segmented sentence representation
+	'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
+    (3) Segments with space symbol
+	['the', '◽', 'boy', 's' '◽'...]
+    (4) Segments with no space symbol
+	['the', 'boy', 's'...]
+        
     """
     def __init__(self, morph_model, file):
         self.model = morph_model                                      # MorphModel
-        # self.segmented_sents = self.segment_sentences(file)     # list(SegmentedSentences)
-
+ 
         # Tokenize text and then segment sentences, using
         # trained MorphModel
         with open(file, 'r') as f:
@@ -34,67 +45,51 @@ class SegmentedSentences:
                 segmented_sents.append(segmented_sent)
             self._segmented_sents = segmented_sents
 
-    # def segment_sentences(self, file):
-    #
-    #     with open(file, 'r') as f:
-    #         segmented_sents = []
-    #         for sent in f:
-    #             # words = sent.split()
-    #             sent = sent.lower()
-    #             words = wordpunct_tokenize(sent)
-    #             segmented_sent = SegmentedSent(words, self.model)
-    #             segmented_sents.append(segmented_sent)
-    #             # print(sent)
-    #             # print(segmented_sent.words)
-    #             # print(segmented_sent.segmented_words)
-    #             # print(segmented_sent._segmented_sent_repr)
-    #             # print(segmented_sent._segments_with_space_symbol)
-    #             # print(segmented_sent._segments_no_space_symbol)
-    #         #print(segmented_sents)
-    #         return segmented_sents
-
-    # def segment_sentence(self, words):
-    #     return SegmentedSent(words, self.model)
-
     @property
     def segmented_sents(self):
         return self._segmented_sents
 
-    # @_segmented_sents.setter
-    # def _segmented_sents(self, sents):
-    #     self._segmented_sents = sents
-
+ 
     def words(self):
+        """Get word representation of a sentence"""
         results = []
-        #print(len(self.segmented_sents))
         for sent in self.segmented_sents:
             results.append(sent.words)
-            # print(sent, sent.words)
+        return results
+    
+    def segmented_words(self):
+        """Get segmented words in a sentence"""
+        
+        results = []
+        for sent in self.segmented_sents:
+            results.append(sent.segmented_words)
         return results
 
-    #def segmented_words(self):
-        #results = []
-        #for sent in self.segmented_sents:
-            #results.append(sent.segmented_words)
-        #return results
-
-    #def segments_space_symbol(self):
-        #results = []
-        #for sent in self.segmented_sents:
-            #results.append(sent.segments_with_space_symbol)
-        #return results
+    def segmented_sent_repr(self):
+        """Get a string segmented sentence representation of a sentence with delimiter between words"""
+        
+        results = []
+        for sent in self.segmented_sents:
+            results.append(sent.segmented_sent_repr)
+        return results
+    
+    def segments_space_symbol(self):
+        """Get segments with delimiter in between"""
+        
+        results = []
+        for sent in self.segmented_sents:
+            results.append(sent.segments_with_space_symbol)
+        return results
 
     def segments_no_space_symbol(self):
+        """Get only segmented words without delimiter"""
+        
         results = []
         for sent in self.segmented_sents:
             results.append(sent.segments_no_space_symbol)
         return results
 
-    #def segmented_sent_repr(self):
-        #results = []
-        #for sent in self.segmented_sents:
-            #results.append(sent.segmented_sent_repr)
-        #return results
+
 
 
 class SegmentedSent:
@@ -107,12 +102,10 @@ class SegmentedSent:
     def __init__(self, words, model):
         self._words = words     # return words
         self.model = model      # MorphModel
-
-        # print(self.model.__class__.__name__)
         
-        #self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
-        #self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
-        #self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
+        self._segmented_words = [" ".join(self.model.segment_word(word)) for word in words]  # ['the', 'boy s', 'chase d', 'the', 'girl s']
+        self._segmented_sent_repr = " ◽ ".join(self._segmented_words)                        # 'the ◽ boy s ◽ chase d ◽ the ◽ girl s'
+        self._segments_with_space_symbol = self._segmented_sent_repr.split()                 # ['the', '◽', 'boy', 's' '◽'...]
         self._segments_no_space_symbol = []                                                  # ['the', 'boy', 's'...]
         for word in words:
             segments = self.model.segment_word(word)
@@ -122,17 +115,17 @@ class SegmentedSent:
     def words(self):
         return self._words
 
-    #@property
-    #def segmented_words(self):
-        #return self._segmented_words
+    @property
+    def segmented_words(self):
+        return self._segmented_words
 
-    #@property
-    #def segmented_sent_repr(self):
-        #return self._segmented_sent_repr
+    @property
+    def segmented_sent_repr(self):
+        return self._segmented_sent_repr
 
-    #@property
-    #def segments_with_space_symbol(self):
-        #return self._segments_with_space_symbol
+    @property
+    def segments_with_space_symbol(self):
+        return self._segments_with_space_symbol
 
     @property
     def segments_no_space_symbol(self):
@@ -149,6 +142,7 @@ if __name__ == "__main__":
 
     # Unit tests
  
+    # (1) Uncomment for system args
     #if len(sys.argv) == 3:
         #filename_src = sys.argv[1]
         #filename_targ = sys.argv[2]
@@ -162,7 +156,8 @@ if __name__ == "__main__":
             
     #else:
         #sys.exit
-      
+    
+    # (2) Test on a given text/texts   
     filenames = ['segments-ep.cs-en.cs.txt']
     #filenames = ['segments-ep.cs-sk.sk.txt'] 
     #filenames = ['segments-ep.cs-sk.cs.txt', 'segments-dgt.cs-sk.cs.txt', 'segments-os.cs-sk.cs.txt',
@@ -178,10 +173,11 @@ if __name__ == "__main__":
         model.shift_boundary()
         model.write()
         
+        # Save model 
         with open('model'+filename[8:-3]+'bin', 'wb') as f:
             pickle.dump(model, f)
             
- 
+        # Open and test model
         with open('model'+filename[8:-3]+'bin', 'rb') as f:
             m = pickle.load(f)
             print('UNKNOWN words for ', filename)
@@ -192,5 +188,5 @@ if __name__ == "__main__":
             file = filename[9:-4] + '.sm'       
             segmented_sents = SegmentedSentences(m, file)
             for seg_sent in segmented_sents.segmented_sents:
-                #print(seg_sent.segmented_words)
+                print(seg_sent.segmented_words)
                 print(seg_sent.segments_no_space_symbol)

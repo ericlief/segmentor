@@ -5,10 +5,10 @@
 Project: segmentor
 Class: MorphModel
 Created on 07.05.17
+Mofified on 30.08.18
 @author: Eric Lief
 """
 
-# import regex as re
 import re
 from collections import defaultdict
 
@@ -43,6 +43,7 @@ class MorphModel:
 
     def process(self):
         """
+        First step:
         All words in the text are processed and a
         signature (label) assigned if one morpheme or
         segment is twice the size (2X) that of all others.
@@ -100,41 +101,38 @@ class MorphModel:
                 for m in morphs:
                     if m != max_len_morph and max(len(m) / max_len, max_len / len(m)) < 2:
                         is_stem_2X = False
-
+                
+                # Now do a preliminary annotation (signature) of segments according to their relative
+                # position wrt the stem (e.g. prefix before, suffix after)
                 signature = ''
                 if is_stem_2X:
-                    #print('stem is 2X for ', morphs)
                     max_i = morphs.index(max_len_morph)
                     for i, m in enumerate(morphs):
                         if i < max_i:
-                            # self.prefixes.append(m)
                             self.prefixes[m] += 1
                             signature += '-p' if signature else 'p'
-                            #print('prefix ', m)
                         elif i > max_i:
-                            # self.suffixes.append(m)
                             self.suffixes[m] += 1
                             signature += '-e' if signature else 'e'
-                            #print('suffix ', m)
                         else:
-                            # self.stems.append(m)
                             self.stems[m] += 1
                             signature += '-s' if signature else 's'
-                            #print('stem ', m)
 
                     # Add word to lists of processed words
                     self.signatures[signature].append(split_word)
                     self.processed_words.add(split_word)
                     self.words_to_segments[orig_word] = morphs
-                    # self.word_to_signature[]
-                    #print(split_word, morphs)
-
-        #print('processed words ', self.processed_words)
 
     def reprocess(self):
-
-        # Alphabetic/on-numeric morphs only
+        """
+        This second post-processing step tries 
+        to identify the segments skipped in the first step, i.e.
+        those with a stem not meeting the minimum size requirements.
+        """
+        
+        # Alphabetic/non-numeric morphs only
         p = re.compile("^([^0-9_\-@#\$\*<>»¿\s\”\"\'\.%\$#@!\^\*/]+\s)+$", re.M)
+        
         # Whitespace
         W = re.compile("^\s+$")
 
@@ -159,14 +157,12 @@ class MorphModel:
 
                 # Already seen word, skip
                 if split_word in self.processed_words:
-                    #print('skipping ', word)
                     continue
-
+                
                 # Get the signature of the morphs
-                #morphs = match[0].split()
                 morphs = split_word.split('-')
 
-                #print('reproc morphs', morphs)
+                # Reprocess morphs not seen yet
                 signature = self.add_signature(morphs)
 
                 # Update data structs/Add word to list of processed words
@@ -177,12 +173,14 @@ class MorphModel:
 
     def add_signature(self, morphs):
         """
-        :param morphs:
-        :return: signature
         Get signature (morpheme labels) of
         a sequence of morphemes and then
         add the segments to their respective
-        dictionaries (as previous method does)
+        dictionaries (as previous method does).
+        
+        Words with no apparent stem are also repaired 
+        if possible.
+        
         :param morphs:
         :return: signature
         """
@@ -210,13 +208,13 @@ class MorphModel:
                 self.unknown[m] += 1
 
         # Check if no stem present in signature.
-        # If so, check if any morphs may also be stems,
-        # and if so, reconstruct signature with the alternate
-        # stem label(s), updating the dictionary.
+        # If so, check if any morphs may also be stems by checking
+        # if they are in the stem dictionary (added in the first pass from 
+        # words with large enough stems.
+        # Then reconstruct signature with the alternate
+        # stem label(s) if the word would be wellformed, updating the dictionaries.
         if 's' not in signature:
-            # print("no stem present for ", morphs)
-            # print('orig sig', signature)
-
+    
             labels = signature.split('-')
             n = len(labels)     # number of labels/length of signature
             new_sig = ''
@@ -229,44 +227,27 @@ class MorphModel:
                     other_label = labels[j]
                     if 'p' in other_label and 's' not in other_label:
                         prefix_to_right = True
-                        # print("prefix to rt for ", word)
                 if not has_stem and m in self.stems and not prefix_to_right:
 
-                    # Change label to stem
-                    # if not prefix_to_right:
+                    # Change label to stem if no prefix_to_right
+                    # since we do not permit ..s-p..
 
-                    #print('adding stem ', m)
                     new_sig += '-s' if new_sig else 's'
                     self.stems[m] += 1  # add to stems dict
                     has_stem = True
 
-                    #print(SubWordUnits.__getattribute__(self, label))
-
+                    # Update dictionaries
                     dict_ref = MorphModel.__getattribute__(self, label)
                     cur_morf_cnt = dict_ref[m]
-                    #print('removing label ', label)
-                    #print(cur_morf_cnt)
-                    #print(dict_ref)
 
                     if cur_morf_cnt > 1:    # update dict for old label
-                        #cur_morf_cnt -= 1
-                        #SubWordUnits.__setattr__(self, label, cur_morf_cnt - 1)
                         dict_ref[m] -= 1
                     else:
-                        #del self.stems[m]
                         del dict_ref[m]
 
-                    #print(SubWordUnits.__getattribute__(self, label))
-
-                else:           # keep label, update
+                else:           # reuse label, update
                     new_sig += '-' + labels[i] if i > 0 else labels[i]
-
-            #print('new sig', new_sig)
-
-            # if not has_stem:
-            #     new_sig = 'no-stem'
-            # self.changed_signature[word] = signature + '->' + new_sig
-
+  
             signature = new_sig
 
         # Count unknowns ('?') in signature
@@ -283,9 +264,7 @@ class MorphModel:
 
     def get_signature(self, morphs):
         """
-        :param morphs:
-        :return: signature
-        Get signature (morpheme labels) of
+        Determine signature (morpheme labels) of
         a sequence of morphemes without
         adding the segments to their respective
         dictionaries (as previous method does)
@@ -294,7 +273,6 @@ class MorphModel:
         """
 
         signature = ''
-        #word = '-'.join(morphs)
         n = len(morphs)
         for i, m in enumerate(morphs):
             if m in self.prefixes and \
@@ -315,72 +293,48 @@ class MorphModel:
             else:  # morph not known, so mark with '?'
                 signature += '-?' if signature else '?'
 
-        # if 's' not in signature:
-        #     signature = 'no-stem'
-
         return signature
 
     def shift_boundary(self):
         """
         Shift/adjust boundary and try to
         force segmentation of previously undefined/
-        unkown sequences, containing one or more ?s.
+        unknown sequences, i.e. words containing one or more unknowns ('?').
 
         All dictionaries are later updated.
         """
-        #print('adjusting boundary')
-        #print(self.ambig_words)
-        #print(self.unknown)
+ 
 
         ambig = list(self.ambig_words.keys())
-        #print(ambig)
         for word in ambig:
-            #print(word)
             old_morphs = word.split('-')
-            # print(old_morphs)
             n = len(old_morphs)
-            #word = ''.join(morphs)
             new_morphs = [old_morphs[0]]
             has_shift = False
             for i in range(0, n - 1):
-                # print("new interation: ", new_morphs)
-
+ 
                 is_valid = False
                 # Original morphs
                 m1 = new_morphs.pop()
                 m2 = old_morphs[i + 1]
-                # print("old m1: ", m1)
-                # print("old m2: ", m2)
-                # print(new_morphs)
-
+   
                 # Do not alter if the signature if the current
-                # candidate morphs is valid
+                # candidate morphs are valid
                 # if m1 not in self.unknown and m2 not in self.unknown:
-                #candidates = new_morphs + [m1, m2]
                 candidates = self.get_candidates(m1, m2, new_morphs)
                 if self.valid_shift(candidates[:-1]):
                     new_morphs = list(candidates)
                     is_valid = True
                     continue
-                #cand_sig = self.get_signature(candidates)
-                #
-                # print(candidates, cand_sig)
-                # if '?' not in cand_sig:
-                #     new_morphs = list(candidates)
-                #     continue
 
                 # Otherwise, shift morpheme boundary left
-                # print('shifting left')
                 has_shift = True
                 new_m1 = m1 + m2[0]
                 new_m2 = m2[1:]
-                # print("new m1: ", new_m1)
-                # print("new m2: ", new_m2)
-
-                # candidates = new_morphs + [new_m1, new_m2]
-
+   
                 # Get candidates
                 candidates =self.get_candidates(new_m1, new_m2, new_morphs)
+                
                 # Is this a valid shift (are both morphs now known)?
                 # If so, do shift and add both morphs to the stack
                 if self.valid_shift(candidates[:-1]):
@@ -389,42 +343,33 @@ class MorphModel:
                     continue
 
                 # Otherwise, try shifting right
-                # print('shifting rt')
                 new_m1 = m1[:-1]
                 new_m2 = m1[-1] + m2
-                # print("new m1: ", new_m1)
-                # print("new m2: ", new_m2)
-
+ 
                 # Get candidates
                 candidates =self.get_candidates(new_m1, new_m2, new_morphs)
-                # print('last chance for cands ', candidates)
-
+ 
                 # Is this a valid shift (are both morphs now known)?
-                # If so, do shift and add both morphs to the stack
+                # If so, do shift and add both morphs to the stack (new segmented word)
 
                 new_morphs = list(candidates)
                 if self.valid_shift(candidates[:-1]):
                     is_valid = True
-                    # print('is valid for ', new_morphs)
                     continue
 
                 # Otherwise, keep old morphs and abort for this word
                 else:
-                    # print('aborting shift')
                     break
 
 
             if has_shift and is_valid and self.valid_shift(new_morphs):
-
 
                 # Add new signature, update dicts
                 new_signature = self.get_signature(new_morphs)
                 adj_word = '-'.join(new_morphs)
                 orig_word = ''.join(new_morphs)
                 word_count = self.alphabetic_words[word]
-                # print('a valid shift found for ', new_morphs)
-                # print("final word", adj_word, new_signature)
-
+ 
                 self.signatures[new_signature].append(adj_word)
                 self.shifted_words[adj_word] = word
                 self.alphabetic_words[adj_word] = word_count
@@ -449,33 +394,22 @@ class MorphModel:
                 # Delete old morphs from respective dicts
                 del self.alphabetic_words[word]
                 old_labels = old_signature.split('-')
-                # print(old_labels)
                 n = len(old_labels)  # number of labels/length of signature
                 for i in range(n):
                     m = old_morphs[i]  # current morph
                     label = self.LABELS[old_labels[i]]  # expand label name
-
-                    # print(SubWordUnits.__getattribute__(self, label))
-
                     dict_ref = MorphModel.__getattribute__(self, label)
                     cur_morf_cnt = dict_ref[m]
-                    # print('removing label ', label)
-                    # print(cur_morf_cnt)
-                    # print(dict_ref)
 
                     if cur_morf_cnt > 1:  # update dict for old label
-                        # print('decrem')
-                        # cur_morf_cnt -= 1
-                        # SubWordUnits.__setattr__(self, label, cur_morf_cnt - 1)
                         dict_ref[m] -= word_count
                     else:
-                        # del self.stems[m]
-                        # print('deleting')
                         del dict_ref[m]
 
     def valid_shift(self, candidates):
         """
-        Validate the potential shift.
+        Validate the potential shift. A split is invalid
+        if it contains any unknowns ('?')
         :param m1:
         :param m2:
         :param new_morphs:
@@ -490,7 +424,8 @@ class MorphModel:
 
     def get_candidates(self, m1, m2, new_morphs):
         """
-        Validate the potential shift.
+        Helper method for shifting boundaries, which
+        concatenates morphs to the running new the potential shift.
         :param m1:
         :param m2:
         :param new_morphs:
@@ -505,7 +440,6 @@ class MorphModel:
         else:
             if m2:
                 candidates = new_morphs + [m2]
-        # print('cands ', candidates)
         return candidates
 
 
@@ -574,16 +508,11 @@ class MorphModel:
             for signature, words in self.signatures.items():
                 counts = len(words)
                 freq = round(counts / V, 3)
-                #f_out.write(str(counts) + '\t' + str(freq) + '\t' + signature + '\n')
                 f_out.write(str(freq) + '\t' + signature + '\n')
-                #f_out.write('raw count: ' + str(n) + '\n')
-                #f_out.write('out of total: ' + str(N) + '\n')
-                #f_out.write('frequency: ' + str(freq) + '\n\n')
-                #print(signature, V)
+
 
         with open('stats-token' + dict_file_suffix, 'w') as f_out:
             N = sum(self.alphabetic_words.values())     # text size/number of tokens
-            # print('total tokens', N)
             f_out.write('1' + '\t' + abbrev_fn + '\n')
             for signature, words in self.signatures.items():
                 counts = 0
@@ -591,15 +520,6 @@ class MorphModel:
                     if word in self.shifted_words:
                         word = self.shifted_words[word]    # lookup original word before adjustment
                     counts += self.alphabetic_words[word]
-                #print(signature, counts)
-                #counts = sum([self.all_words[w] for w in words])
-                #raw_cnt = len(words)
+              
                 freq = round(counts / N, 3)
-                #f_out.write('\n')
                 f_out.write(str(freq) + '\t' + signature + '\n')
-                #f_out.write(str(counts) + '\t' + str(freq) + '\t' + signature + '\n')
-                #f_out.write('raw count: ' + str(n) + '\n')
-                #f_out.write('out of total: ' + str(N) + '\n')
-                #f_out.write('frequency: ' + str(freq) + '\n\n')
-
-

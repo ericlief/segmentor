@@ -4,11 +4,14 @@
 """
 Project: segmentor
 
-Main method for testing the MorphModel class.
-The training files can be batch processed
-by their Morfessor 'segments-' prefixed filenames.
+These helper functions write the alignments (fwd and bwd) to file
+in the preferred representation format.
+The intersection of fwd and bwd alignments are also computed,
+and the frequency of the tar-src morheme/segment signature (type)
+is also updated and written to file.
 
 Created on 30.05.17
+Modified on 30.08.18
 @author: Eric Lief
 """
 
@@ -152,10 +155,8 @@ def grow_diag_final_and(srclen, trglen, e2f, f2e):
 
 def identify_morph(morph, morph_model):
     """
-    Rudimentary (rough) way of identifying
-    what type of morph a segment is for a
-    given language, by checking
-    the dictionaries in the MorphModel
+    Rudimentary (rough) way of identifying what type of morph a segment is for a
+    given language, by checking the dictionaries in the MorphModel
     :param morph:
     :param morph_model:
     :return:
@@ -187,7 +188,7 @@ if __name__ == "__main__":
             print('loaded model targ', model_targ.__class__.__name__) 
             
     else:
-        sys.exit
+        sys.exit("Usage python get_alignments.py [src_file] [tar_file]")
         
     segmented_sents_src = SegmentedSentences(model_src, filename_src)
     segmented_sents_targ = SegmentedSentences(model_targ, filename_targ)
@@ -198,33 +199,37 @@ if __name__ == "__main__":
     aligned_sentences_f2e = []
     for sent_targ, sent_src in zip(segmented_sents_targ.segmented_sents, segmented_sents_src.segmented_sents):
 
-        # Forward
+        # Get fwd alignments in the form of an AlignedSentence object
+        # We must choose appropriate representation (1-4)
         # aligned_sent = AlignedSentence(sent_targ, sent_src)
         # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_targ, sent_src)
         # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_targ, sent_src)
         aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_targ, sent_src)
+        
+        # Add to list of aligned fwd sentences
         aligned_sentences_e2f.append(aligned_sent)
 
-        # Backward
+        # Get bwd alignments in the form of an AlignedSentence object
+        # We must choose appropriate representation (1-4)
         # aligned_sent = AlignedSentence.from_segmented_sent_to_words(sent_src, sent_trg)
-        #aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_targ)
+        # aligned_sent = AlignedSentence.from_segmented_sent_to_segments_with_space_symbol(sent_src, sent_targ)
         aligned_sent = AlignedSentence.from_segmented_sent_to_segments_no_space_symbol(sent_src, sent_targ)
+        
+        # Add to list of aligned bwd sentences
         aligned_sentences_f2e.append(aligned_sent)
 
     # Train both forward and backward models, get alignments
     iters = 20
     thresh = .30
-    #file = 'alignments_no_space' + filename_src[-16:-7] + '.redo'
-    file = 'alignments_no_space_' + filename_src
+    file = 'alignments_no_space_' + filename_src  # change  name accordingly 
 
     # Forward (English) model with alignments
-    # model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='output_alignments_small_e2f.txt')
     model_e2f = IBM1(aligned_sentences_e2f, iters, thresh, output='fwd_no_space_' + file)
-
 
     # Backward (Foreign) model with alignments
     model_f2e = IBM1(aligned_sentences_f2e, iters, thresh, output='back_no_space_' + file)
 
+    # A little test 
     # e2f_alignments = [sent.alignment for sent in e2f_sents]
     # f2e_alignments = [sent.inverse_alignment() for sent in f2e_sents]
     # alignments = [set(e2f).intersection(set(f2e)) for (e2f, f2e) in zip(e2f_alignments, f2e_alignments)]
@@ -240,34 +245,32 @@ if __name__ == "__main__":
         # Iterate through forward and backward pairs, write alignments
         # and get intersection (symmetrize)
         for k, forward_sent in enumerate(e2f_sents):
-        # for k, e_sent in enumerate(f2e_sents):
-
+ 
             # Convert alignments to string representation
             e2f_str = ''
             e2f = forward_sent.alignment            # forward alignment
-            # e2f = e_sent.inverse_alignment() # inverse?
-
+ 
             for j, i in e2f:
                 e2f_str += str(j) + '-' + str(i) + ' '
 
             f2e_str = ''
             f_sent = f2e_sents[k]               # corresponding backward sentence
-            # f_sent = e2f_sents[k]
-
+ 
             f2e = f_sent.inverse_alignment()    # backward alignment
-            # f2e = f_sent.alignment
-            for j, i in f2e:
+             for j, i in f2e:
                 f2e_str += str(j) + '-' + str(i) + ' '
 
             # Get intersection, convert to string
             int_str = ''
             intersection = set(e2f).intersection(set(f2e))
-            # intersection = set(f2e).intersection(set(e2f))
-
+ 
             for j, i in intersection:
                 int_str += str(j) + '-' + str(i) + ' '
 
-            # # Symmetrization of bidirectional alignment (Cohn)
+            # Symmetrization of bidirectional alignment (Koehn)
+            # Uncomment to use the GDFA algorithm
+            # I could not get it to work properly with segments_no_space_symbol
+            
             # srclen = len(e_sent.mots)       # len of src sentence (f)
             # trglen = len(e_sent.words)      # len of tar sentence (e)
             # # trglen = len(e_sent.mots)  # len of src sentence (f)
@@ -282,7 +285,7 @@ if __name__ == "__main__":
             words = forward_sent.words      # target sentence
             mots = forward_sent.mots        # source sentence
 
-            # Write
+            # Write results, final stats appear as a dictionary with frequency at end of file
             f.write('\t'.join(words) + '\n')
             f.write('\t'.join(mots) + '\n')
             f.write(e2f_str + '\n')
@@ -299,56 +302,11 @@ if __name__ == "__main__":
                 signatures[sig] += 1
 
 
-
-
             f.write('stats\n')
             f.write(str(signatures) + '\n')
-
+            
+            # Uncomment if using the GDFA algorithm
             # f.write('symmetrization\n')
             # f.write(sym_str + '\n')
 
-    # file = 'stats' + filename_cs[-16:-7] + '.txt'
-    # with open(file, 'w') as f:
-    #
-
-
-
-
-
-
-
-
-
-
-
-
-
-            # model.write_alignments(file)
-
-        # for sent in segs_spaces_cs:
-        #
-        #             f_out.write(str(sent) + '\n')
-        #
-
-        # # Write to disk
-        # with open('sent-repr' + filename[-13:], 'w') as f_out:
-        # #with open('test-sent-repr.txt', 'w') as f_out:
-        #
-        #     # words = segmented_sents.words()
-        #     # segmented_words = segmented_sents.segmented_words()
-        #     repr = segmented_sents.segmented_sent_repr()
-        #     # segs_no_space = segmented_sents.segments_no_space_symbol()
-        #
-        #     for sent in repr:
-        #         f_out.write(str(sent) + '\n')
-
-
-        # print(segmented_sents.words())
-        # print(segmented_sents.segmented_words())
-        # print(segmented_sents.segments_space_symbol())
-        # print(segmented_sents.segments_no_space_symbol())
-
-        # print(segmented_sents.segments_space_symbol())
-
-
-
+  
